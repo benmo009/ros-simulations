@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mobot">
 
-    <xacro:include filename="$(find mobile_robot_sim)/urdf/mobot_xacro_defs.xacro"/>
-    <xacro:include filename="$(find mobile_robot_sim)/urdf/mobot_base_link.xacro"/>
-    <xacro:include filename="$(find mobile_robot_sim)/urdf/mobot_wheels.xacro"/>
-    <xacro:include filename="$(find mobile_robot_sim)/urdf/mobot_gazebo_plugin.xacro"/>
+    <xacro:include filename="$(find mobile_robot)/urdf/mobot_xacro_defs.xacro"/>
+    <xacro:include filename="$(find mobile_robot)/urdf/mobot_base_link.xacro"/>
+    <xacro:include filename="$(find mobile_robot)/urdf/mobot_wheels.xacro"/>
+    <xacro:include filename="$(find mobile_robot)/urdf/mobot_gazebo_plugin.xacro"/>
 
 
 </robot>

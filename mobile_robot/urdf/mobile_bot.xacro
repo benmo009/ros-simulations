@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mobile_bot">
+
+    <!-- Xacro properties -->
+    <xacro:property name="body_len" value="0.4"/>
+    <xacro:property name="body_width" value="0.2"/>
+    <xacro:property name="body_height" value="0.2"/>
+    <xacro:property name="wheel_diam" value="0.2"/>
+    <xacro:property name="wheel_rad" value="${wheel_diam/2.0}"/>
+    <xacro:property name="wheel_width" value="0.05"/>
+    <xacro:property name="wheel_sep" value="${body_width - wheel_width}"/>
+
+    <xacro:property name="pi" value="3.14159265359"/>
+
+    <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+    </material>
+
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+    
+    <material name="white">
+        <color rgba="1 1 1 1"/>
+    </material>
+
+    <xacro:macro name="default_inertial" params="mass">
+        <inertial>
+            <mass value="${mass}"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                     iyy="1.0" iyz="0.0"
+                     izz="1.0"/>
+        </inertial>
+    </xacro:macro>
+
+    <!-- Robot base link -->
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="${body_len} ${body_width} ${body_height}"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${body_len} ${body_width} ${body_height}"/>
+            </geometry>
+        </collision>
+        <xacro:default_inertial mass="20"/>
+    </link>
+    
+
+    <!-- Wheel macro -->
+    <xacro:macro name="wheel" params="prefix reflect">
+        <link name="${prefix}_wheel">
+            <visual>
+                <geometry>
+                    <cylinder radius="${wheel_rad}" length="${wheel_width}"/>
+                </geometry>
+                <material name="white"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder radius="${wheel_rad}" length="${wheel_width}"/>
+                </geometry>           
+            </collision>
+            <xacro:default_inertial mass="1"/>
+        </link>
+
+        <joint name="${prefix}_wheel_joint" type="continuous">
+            <axis xyz="0 0 1"/>
+            <parent link="base_link"/>
+            <child link="${prefix}_wheel"/>
+            <origin xyz="${body_len/2.0 - body_len/3.0} ${reflect*wheel_sep/2.0} ${-wheel_rad}" rpy="${pi/2.0} 0 0"/>
+            <limit effort="100" velocity="15"/>
+            <joint_properties damping="0.0" friction="0.0"/>
+        </joint>
+
+        <gazebo reference="{prefix}_wheel">
+            <mu1 value="200.0"/>
+            <mu2 value="100.0"/>
+            <kp value="10000000.0"/>
+            <kd value="1.0"/>
+            <material>Gazebo/Grey</material>
+        </gazebo>
+
+        <transmission name="${prefix}_wheel_trans">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="${prefix}_wheel_motor">
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="${prefix}_wheel_joint">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        
+    </xacro:macro>
+
+    <xacro:wheel prefix="left" reflect="1"/>
+    <xacro:wheel prefix="right" reflect="-1"/>
+
+    <!-- Front castor -->
+    <link name="castor">
+        <visual>
+            <geometry>
+                <sphere radius="${wheel_rad/2.0}"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="${wheel_rad/2.0}"/>
+            </geometry>
+        </collision>
+        <xacro:default_inertial mass="0.5"/>
+    </link>
+
+    <joint name="castor_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="castor"/>
+        <origin xyz="${wheel_rad/2.0 - body_len/2.0} 0 ${-1.5*wheel_rad}" rpy="0 0 0"/>
+    </joint>
+
+    <gazebo reference="castor">
+        <mu1 value="0.0"/>
+        <mu2 value="0.0"/>
+    </gazebo>
+
+    <!-- Gazebo plugin for ROS Control -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/</robotNamespace>
+        </plugin>
+    </gazebo>
+
+
+</robot>

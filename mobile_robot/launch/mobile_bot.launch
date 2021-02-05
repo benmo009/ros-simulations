@@ -1,0 +1,32 @@
+<launch>
+    <!-- Load the empty world from gazebo_ros package -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find mobile_robot)/worlds/room.world"/>
+    </include>
+
+    <!-- Load robot description xacro to the parameter server -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find mobile_robot)/urdf/mobile_bot.xacro'" />
+    
+    <!-- Spawn a robot into Gazebo -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 4.5 -y -4.5 -z 1.0 -model mobile_bot" />
+
+
+
+    <!-- Start robot state publisher node -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="30.0" />
+    </node>
+
+    <!-- Start rviz -->
+
+    <!-- Load diff drive config file to parameter server -->
+    <rosparam command="load" file="$(find mobile_robot)/config/mobile_bot_diffdrive.yaml" ns="mobile_bot_diff_drive_controller"/>
+
+    <!-- Start controller spawner node -->
+    <node name="mobile_bot_controller_spawner" pkg="controller_manager" type="spawner"
+        args="mobile_bot_diff_drive_controller --shutdown-timeout 3"/>
+
+    <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+        <param name="default_topic" value="/mobile_bot_diff_drive_controller/cmd_vel"/>
+    </node>
+</launch>

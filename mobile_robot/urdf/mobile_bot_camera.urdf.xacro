@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mobile_bot_camera">
+
+    <!-- Realsense2 d435 Camera -->
+    <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro"/>
+    <xacro:sensor_d435 parent="body_link" use_nominal_extrinsics="true">
+        <origin xyz="${-half_body_len} 0 ${half_body_height}" rpy="0 0 ${pi}"/>
+    </xacro:sensor_d435>
+    
+    <!-- Gazebo Sensor Plugin for Depth Camera -->
+    <gazebo reference="camera_link">
+        <sensor name="$realsense2_d435_camera" type="depth">
+            <update_rate>20</update_rate>
+            <camera>
+                <horizontal_fov>1.047198</horizontal_fov>
+                <image>
+                    <width>640</width>
+                    <height>480</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <near>0.05</near>
+                    <far>3</far>
+                </clip>
+            </camera>
+            <plugin name="camera_link_controller" filename="libgazebo_ros_openni_kinect.so">
+                <baseline>0.2</baseline>
+                <alwaysOn>true</alwaysOn>
+                <updateRate>0.0</updateRate>
+                <cameraName>realsense2_d435_ir</cameraName>
+                <imageTopicName>/realsense2_d435/color/image_raw</imageTopicName>
+                <cameraInfoTopicName>/realsense2_d435/color/camera_info</cameraInfoTopicName>
+                <depthImageTopicName>/realsense2_d435/depth/image_raw</depthImageTopicName>
+                <depthImageInfoTopicName>/realsense2_d435/depth/camera_info</depthImageInfoTopicName>
+                <pointCloudTopicName>/realsense2_d435/depth/points</pointCloudTopicName>
+                <frameName>camera_link</frameName>
+                <pointCloudCutoff>0.5</pointCloudCutoff>
+                <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+                <distortionK1>0.00000001</distortionK1>
+                <distortionK2>0.00000001</distortionK2>
+                <distortionK3>0.00000001</distortionK3>
+                <distortionT1>0.00000001</distortionT1>
+                <distortionT2>0.00000001</distortionT2>
+                <CxPrime>0</CxPrime>
+                <Cx>0</Cx>
+                <Cy>0</Cy>
+                <focalLength>0</focalLength>
+                <hackBaseline>0</hackBaseline>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+</robot>

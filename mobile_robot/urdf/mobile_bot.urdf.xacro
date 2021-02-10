@@ -2,6 +2,8 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mobile_bot">
 
     <!-- Xacro properties -->
+
+    <!-- Body dimensions -->
     <xacro:property name="body_len" value="0.325"/>
     <xacro:property name="body_width" value="0.340"/>
     <xacro:property name="body_height" value="0.1345"/>
@@ -11,7 +13,7 @@
     <xacro:property name="half_body_height" value="${body_height/2.0}"/>
     <xacro:property name="bodyOz" value="${half_body_height + clearance}"/>
 
-
+    <!-- Wheel dimensions -->
     <xacro:property name="wheel_diam" value="0.1016"/>
     <xacro:property name="wheel_rad" value="${wheel_diam/2.0}"/>
     <xacro:property name="wheel_width" value="0.025"/>
@@ -20,14 +22,16 @@
     <xacro:property name="wheelOy" value="${wheel_sep/2.0}"/>
     <xacro:property name="wheelOz" value="${wheel_rad - bodyOz}"/>
 
+    <!-- Castor dimensions -->
     <xacro:property name="castor_diam" value="0.050"/>
     <xacro:property name="castor_rad" value="${castor_diam/2.0}"/>
     <xacro:property name="wheel_to_castor" value="0.2415"/>
     <xacro:property name="castorOx" value="${wheel_to_castor + wheelOx}"/>
     <xacro:property name="castorOz" value="${castor_rad - bodyOz}"/>
 
-    <xacro:property name="pi" value="3.14159265359"/>
+    <xacro:property name="M_PI" value="3.14159265359"/>
 
+    <!-- Material Definitions -->
     <material name="blue">
         <color rgba="0 0 0.8 1"/>
     </material>
@@ -40,6 +44,7 @@
         <color rgba="1 1 1 1"/>
     </material>
 
+    <!-- Default Inertial macro -->
     <xacro:macro name="default_inertial" params="mass">
         <inertial>
             <mass value="${mass}"/>
@@ -72,7 +77,6 @@
         <parent link="base_link"/>
         <child link="body_link"/>
     </joint>
-    
 
     <!-- Wheel macro -->
     <xacro:macro name="wheel" params="prefix reflect">
@@ -95,7 +99,7 @@
             <axis xyz="0 0 1"/>
             <parent link="body_link"/>
             <child link="${prefix}_wheel_link"/>
-            <origin xyz="${wheelOx} ${reflect*wheelOy} ${wheelOz}" rpy="${pi/2.0} 0 0"/>
+            <origin xyz="${wheelOx} ${reflect*wheelOy} ${wheelOz}" rpy="${M_PI/2.0} 0 0"/>
             <limit effort="100" velocity="15"/>
             <joint_properties damping="0.0" friction="0.0"/>
         </joint>
@@ -118,9 +122,9 @@
             </joint>
         </transmission>
 
-        
     </xacro:macro>
 
+    <!-- Wheels -->
     <xacro:wheel prefix="left" reflect="1"/>
     <xacro:wheel prefix="right" reflect="-1"/>
 
@@ -146,11 +150,13 @@
         <origin xyz="${castorOx} 0 ${castorOz}" rpy="0 0 0"/>
     </joint>
 
+    <!-- Tell Gazebo it has 0 friction -->
     <gazebo reference="castor_link">
         <mu1 value="0.0"/>
         <mu2 value="0.0"/>
     </gazebo>
 
+    <!-- Camera and Laser -->
     <xacro:include filename="$(find mobile_robot)/urdf/mobile_bot_camera.urdf.xacro" />
     <xacro:include filename="$(find mobile_robot)/urdf/mobile_bot_laser.urdf.xacro" />
 

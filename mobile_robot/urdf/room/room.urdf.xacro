@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="room">
+
+    <xacro:property name="wall_length" value="10.0" />
+    <xacro:property name="wall_width" value="0.25" />
+    <xacro:property name="wall_height" value="4" />
+
+    <xacro:property name="half_wall_length" value="${wall_length/2.0}" />
+    <xacro:property name="half_wall_width" value="${wall_width/2.0}" />
+    <xacro:property name="half_wall_height" value="${wall_height/2.0}" />
+
+    <xacro:property name="M_PI" value="3.14159265359"/>
+
+    <!-- Default Inertial macro -->
+    <xacro:macro name="default_inertial" params="mass">
+        <inertial>
+            <mass value="${mass}"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                     iyy="1.0" iyz="0.0"
+                     izz="1.0"/>
+        </inertial>
+    </xacro:macro>
+
+    <!-- World Link -->
+    <link name="world"/>
+
+    <link name="base_link"/>
+
+    <joint name="world_to_base_joint" type="fixed">
+        <parent link="world" />
+        <child link="base_link" />
+    </joint>
+
+    <!-- Wall macro -->
+    <xacro:macro name="wall" params="*origin number">
+        <link name="wall_${number}_link">
+            <visual>
+                <geometry>
+                    <box size="${wall_length} ${wall_width} ${wall_height}" />
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <box size="${wall_length} ${wall_width} ${wall_height}" />
+                </geometry>
+            </collision>
+            <xacro:default_inertial mass="50" />
+        </link>
+
+        <joint name="wall_${number}_joint" type="fixed">
+            <parent link="base_link" />
+            <child link="wall_${number}_link" />
+            <xacro:insert_block name="origin" />
+        </joint>
+
+        <gazebo reference="wall_${number}_link">
+            <material>Gazebo/Orange</material>
+        </gazebo>
+    </xacro:macro>
+
+    <!-- Place walls -->
+    <xacro:wall number="1">
+        <origin xyz="${half_wall_length} ${-half_wall_width} ${half_wall_height}" rpy="0 0 0" />
+    </xacro:wall>
+
+    <xacro:wall number="2">
+        <origin xyz="${half_wall_length} ${wall_length + half_wall_width} ${half_wall_height}" rpy="0 0 0" />
+    </xacro:wall>
+
+    <xacro:wall number="3">
+        <origin xyz="${-half_wall_width} ${half_wall_length} ${half_wall_height}" rpy="0 0 ${M_PI/2.0}" />
+    </xacro:wall>
+
+    <xacro:wall number="4">
+        <origin xyz="${wall_length + half_wall_width} ${half_wall_length} ${half_wall_height}" rpy="0 0 ${M_PI/2.0}" />
+    </xacro:wall>
+
+
+    <!-- Block macro -->
+    <xacro:macro name="block" params="number size *origin *material">
+        <link name="block_${number}_link">
+            <visual>
+                <geometry>
+                    <box size="${size}" />
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <box size="${size}" />
+                </geometry>
+            </collision>
+            <xacro:default_inertial mass="20" />
+        </link>
+
+        <joint name="block_${number}_joint" type="fixed">
+            <parent link="base_link" />
+            <child link="block_${number}_link" />
+            <xacro:insert_block name="origin" />
+        </joint>
+
+        <gazebo reference="block_${number}_link">
+            <xacro:insert_block name="material" />
+        </gazebo>
+    </xacro:macro>
+
+    <!-- Place blocks -->
+    <xacro:property name="table_height" value="1.0" />
+
+    <xacro:block number="table_1" size="2 1 ${table_height}">
+        <origin xyz="5 5 ${table_height/2.0}" rpy="0 0 ${M_PI/2.0}" />
+        <material>Gazebo/Purple</material>
+    </xacro:block>
+
+    <xacro:block number="table_2" size="2 1 ${table_height}">
+        <origin xyz="2 8 ${table_height/2.0}" rpy="0 0 0" />
+        <material>Gazebo/Purple</material>
+    </xacro:block>
+
+    <xacro:property name="cabinet_height" value="2.0" />
+
+    <xacro:block number="cabinet_1" size="2 1 ${cabinet_height}">
+        <origin xyz="9.5 8 ${cabinet_height/2.0}" rpy="0 0 ${M_PI/2.0}" />
+        <material>Gazebo/White</material>
+    </xacro:block>
+
+    <xacro:block number="cabinet_2" size="2 1 ${cabinet_height}">
+        <origin xyz="9.5 1 ${cabinet_height/2.0}" rpy="0 0 ${M_PI/2.0}" />
+        <material>Gazebo/White</material>
+    </xacro:block>
+
+    <xacro:block number="cabinet_3" size="2 1.5 ${cabinet_height}">
+        <origin xyz="6 ${1.5/2.0} ${cabinet_height/2.0}" rpy="0 0 0" />
+        <material>Gazebo/White</material>
+    </xacro:block>
+
+    <xacro:block number="cabinet_4" size="2 1 ${cabinet_height}">
+        <origin xyz="4 0.5 ${cabinet_height/2.0}" rpy="0 0 0" />
+        <material>Gazebo/White</material>
+    </xacro:block>
+
+    <!-- Stool Macro -->
+    <xacro:macro name="stool" params="name radius height *origin *material">
+        <link name="stool_${name}_link">
+            <visual>
+                <geometry>
+                    <cylinder radius="${radius}" length="${height}" />
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder radius="${radius}" length="${height}" />
+                </geometry>
+            </collision>
+            <xacro:default_inertial mass="10" />
+        </link>
+
+        <joint name="stool_${name}_joint" type="fixed">
+            <parent link="base_link" />
+            <child link="stool_${name}_link" />
+            <xacro:insert_block name="origin" />
+        </joint>
+
+        <gazebo reference="stool_${name}_link">
+            <xacro:insert_block name="material" />
+        </gazebo>
+    </xacro:macro>
+
+    <!-- Place cylinders -->
+    <xacro:stool name="tall" radius="0.5" height="1.5">
+        <origin xyz="8 5 ${1.5/2.0}" rpy="0 0 0" />
+        <material>Gazebo/Green</material>
+    </xacro:stool>
+
+    <xacro:property name="stool_height" value="0.4" />
+    <xacro:property name="stool_rad" value="0.25" />
+
+    <xacro:stool name="1" radius="${stool_rad}" height="${stool_height}">
+        <origin xyz="2 7 ${stool_height/2.0}" rpy="0 0 0" />
+        <material>Gazebo/Turquoise</material>
+    </xacro:stool>
+
+    <xacro:stool name="2" radius="${stool_rad}" height="${stool_height}">
+        <origin xyz="4.2 4.2 ${stool_height/2.0}" rpy="0 0 0" />
+        <material>Gazebo/Turquoise</material>
+    </xacro:stool>
+
+    <xacro:stool name="3" radius="${stool_rad}" height="${stool_height}">
+        <origin xyz="4.2 5.8 ${stool_height/2.0}" rpy="0 0 0" />
+        <material>Gazebo/Turquoise</material>
+    </xacro:stool>
+
+</robot>

@@ -1,19 +1,22 @@
 <launch>
     <!-- Arguments -->
-    <arg name="model" default="$(find mobile_robot)/urdf/mobile_bot.urdf.xacro" />
+    <arg name="robot" default="$(find mobile_robot)/urdf/mobile_bot.urdf.xacro" />
+    <arg name="room" default="$(find mobile_robot)/urdf/room/room.urdf.xacro" />
     <arg name="rvizconfig" default="$(find mobile_robot)/rviz/mobile_bot.rviz" />
 
     <!-- Load the empty world from gazebo_ros package -->
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find mobile_robot)/worlds/room.world"/>
-    </include>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" />
 
     <!-- Load robot description xacro to the parameter server -->
-    <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+    <param name="robot_description" command="$(find xacro)/xacro $(arg robot)" />
+    <param name="room_description" command="$(find xacro)/xacro $(arg room)" />
     
     <!-- Spawn the robot into Gazebo -->
     <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" 
-        args="-param robot_description -urdf -x 4.5 -y -4.5 -z 1.0 -model mobile_bot" />
+        args="-param robot_description -urdf -x 1.0 -y 1.0 -z 1.0 -model mobile_bot" />
+    
+    <node name="spawn_room" pkg="gazebo_ros" type="spawn_model" 
+        args="-param room_description -urdf -model room" />
 
     <!-- Start robot state publisher node -->
     <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">

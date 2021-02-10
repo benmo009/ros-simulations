@@ -4,12 +4,15 @@
     <!-- Realsense2 d435 Camera -->
     <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro"/>
     <xacro:sensor_d435 parent="body_link" use_nominal_extrinsics="true">
-        <origin xyz="${-half_body_len} 0 ${half_body_height}" rpy="0 0 ${pi}"/>
+        <origin xyz="${-half_body_len} 0 ${half_body_height}" rpy="0 0 ${M_PI}"/>
     </xacro:sensor_d435>
+
+    <xacro:property name="link_name" value="camera_link" />
+    <xacro:property name="camera_name" value="realsense2_d435" />
     
     <!-- Gazebo Sensor Plugin for Depth Camera -->
-    <gazebo reference="camera_link">
-        <sensor name="$realsense2_d435_camera" type="depth">
+    <gazebo reference="${link_name}">
+        <sensor name="${camera_name}_camera" type="depth">
             <update_rate>20</update_rate>
             <camera>
                 <horizontal_fov>1.047198</horizontal_fov>
@@ -27,13 +30,13 @@
                 <baseline>0.2</baseline>
                 <alwaysOn>true</alwaysOn>
                 <updateRate>0.0</updateRate>
-                <cameraName>realsense2_d435_ir</cameraName>
-                <imageTopicName>/realsense2_d435/color/image_raw</imageTopicName>
-                <cameraInfoTopicName>/realsense2_d435/color/camera_info</cameraInfoTopicName>
-                <depthImageTopicName>/realsense2_d435/depth/image_raw</depthImageTopicName>
-                <depthImageInfoTopicName>/realsense2_d435/depth/camera_info</depthImageInfoTopicName>
-                <pointCloudTopicName>/realsense2_d435/depth/points</pointCloudTopicName>
-                <frameName>camera_link</frameName>
+                <cameraName>${camera_name}_ir</cameraName>
+                <imageTopicName>/mobile_bot/${camera_name}/color/image_raw</imageTopicName>
+                <cameraInfoTopicName>/mobile_bot/${camera_name}/color/camera_info</cameraInfoTopicName>
+                <depthImageTopicName>/mobile_bot/${camera_name}/depth/image_raw</depthImageTopicName>
+                <depthImageInfoTopicName>/mobile_bot/${camera_name}/depth/camera_info</depthImageInfoTopicName>
+                <pointCloudTopicName>/mobile_bot/${camera_name}/depth/points</pointCloudTopicName>
+                <frameName>${link_name}</frameName>
                 <pointCloudCutoff>0.5</pointCloudCutoff>
                 <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
                 <distortionK1>0.00000001</distortionK1>

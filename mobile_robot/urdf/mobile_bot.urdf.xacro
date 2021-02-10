@@ -18,7 +18,7 @@
     <xacro:property name="wheel_rad" value="${wheel_diam/2.0}"/>
     <xacro:property name="wheel_width" value="0.025"/>
     <xacro:property name="wheel_sep" value="${body_width - wheel_width}"/>
-    <xacro:property name="wheelOx" value="${wheel_rad - half_body_len}"/>
+    <xacro:property name="wheelOx" value="${half_body_len - wheel_rad}"/>
     <xacro:property name="wheelOy" value="${wheel_sep/2.0}"/>
     <xacro:property name="wheelOz" value="${wheel_rad - bodyOz}"/>
 
@@ -26,7 +26,7 @@
     <xacro:property name="castor_diam" value="0.050"/>
     <xacro:property name="castor_rad" value="${castor_diam/2.0}"/>
     <xacro:property name="wheel_to_castor" value="0.2415"/>
-    <xacro:property name="castorOx" value="${wheel_to_castor + wheelOx}"/>
+    <xacro:property name="castorOx" value="${wheelOx - wheel_to_castor}"/>
     <xacro:property name="castorOz" value="${castor_rad - bodyOz}"/>
 
     <xacro:property name="M_PI" value="3.14159265359"/>
@@ -99,7 +99,7 @@
             <axis xyz="0 0 1"/>
             <parent link="body_link"/>
             <child link="${prefix}_wheel_link"/>
-            <origin xyz="${wheelOx} ${reflect*wheelOy} ${wheelOz}" rpy="${M_PI/2.0} 0 0"/>
+            <origin xyz="${wheelOx} ${reflect*wheelOy} ${wheelOz}" rpy="${-M_PI/2.0} 0 0"/>
             <limit effort="100" velocity="15"/>
             <joint_properties damping="0.0" friction="0.0"/>
         </joint>

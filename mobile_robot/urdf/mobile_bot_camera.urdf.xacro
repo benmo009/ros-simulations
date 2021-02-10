@@ -4,7 +4,7 @@
     <!-- Realsense2 d435 Camera -->
     <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro"/>
     <xacro:sensor_d435 parent="body_link" use_nominal_extrinsics="true">
-        <origin xyz="${-half_body_len} 0 ${half_body_height}" rpy="0 0 ${M_PI}"/>
+        <origin xyz="${half_body_len} 0 ${half_body_height}" rpy="0 0 0"/>
     </xacro:sensor_d435>
 
     <xacro:property name="link_name" value="camera_link" />

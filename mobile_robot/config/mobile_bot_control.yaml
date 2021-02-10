@@ -5,8 +5,8 @@ mobile_bot:
     type: "diff_drive_controller/DiffDriveController"
     publish_rate: 50
 
-    left_wheel: ['right_wheel_joint']
-    right_wheel: ['left_wheel_joint']
+    left_wheel: ['left_wheel_joint']
+    right_wheel: ['right_wheel_joint']
 
     # wheel_separation: 0.45
     

@@ -2,13 +2,29 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mobile_bot">
 
     <!-- Xacro properties -->
-    <xacro:property name="body_len" value="0.4"/>
-    <xacro:property name="body_width" value="0.2"/>
-    <xacro:property name="body_height" value="0.2"/>
-    <xacro:property name="wheel_diam" value="0.2"/>
+    <xacro:property name="body_len" value="0.325"/>
+    <xacro:property name="body_width" value="0.340"/>
+    <xacro:property name="body_height" value="0.1345"/>
+    <xacro:property name="clearance" value="0.025"/>
+
+    <xacro:property name="half_body_len" value="${body_len/2.0}"/>
+    <xacro:property name="half_body_height" value="${body_height/2.0}"/>
+    <xacro:property name="bodyOz" value="${half_body_height + clearance}"/>
+
+
+    <xacro:property name="wheel_diam" value="0.1016"/>
     <xacro:property name="wheel_rad" value="${wheel_diam/2.0}"/>
-    <xacro:property name="wheel_width" value="0.05"/>
+    <xacro:property name="wheel_width" value="0.025"/>
     <xacro:property name="wheel_sep" value="${body_width - wheel_width}"/>
+    <xacro:property name="wheelOx" value="${wheel_rad - half_body_len}"/>
+    <xacro:property name="wheelOy" value="${wheel_sep/2.0}"/>
+    <xacro:property name="wheelOz" value="${wheel_rad - bodyOz}"/>
+
+    <xacro:property name="castor_diam" value="0.050"/>
+    <xacro:property name="castor_rad" value="${castor_diam/2.0}"/>
+    <xacro:property name="wheel_to_castor" value="0.2415"/>
+    <xacro:property name="castorOx" value="${wheel_to_castor + wheelOx}"/>
+    <xacro:property name="castorOz" value="${castor_rad - bodyOz}"/>
 
     <xacro:property name="pi" value="3.14159265359"/>
 
@@ -34,7 +50,10 @@
     </xacro:macro>
 
     <!-- Robot base link -->
-    <link name="base_link">
+    <link name="base_link"/>
+
+    <!-- Robot Body Link -->
+    <link name="body_link">
         <visual>
             <geometry>
                 <box size="${body_len} ${body_width} ${body_height}"/>
@@ -48,11 +67,16 @@
         </collision>
         <xacro:default_inertial mass="20"/>
     </link>
+
+    <joint name="body_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="body_link"/>
+    </joint>
     
 
     <!-- Wheel macro -->
     <xacro:macro name="wheel" params="prefix reflect">
-        <link name="${prefix}_wheel">
+        <link name="${prefix}_wheel_link">
             <visual>
                 <geometry>
                     <cylinder radius="${wheel_rad}" length="${wheel_width}"/>
@@ -69,14 +93,14 @@
 
         <joint name="${prefix}_wheel_joint" type="continuous">
             <axis xyz="0 0 1"/>
-            <parent link="base_link"/>
-            <child link="${prefix}_wheel"/>
-            <origin xyz="${body_len/2.0 - body_len/3.0} ${reflect*wheel_sep/2.0} ${-wheel_rad}" rpy="${pi/2.0} 0 0"/>
+            <parent link="body_link"/>
+            <child link="${prefix}_wheel_link"/>
+            <origin xyz="${wheelOx} ${reflect*wheelOy} ${wheelOz}" rpy="${pi/2.0} 0 0"/>
             <limit effort="100" velocity="15"/>
             <joint_properties damping="0.0" friction="0.0"/>
         </joint>
 
-        <gazebo reference="{prefix}_wheel">
+        <gazebo reference="{prefix}_wheel_link">
             <mu1 value="200.0"/>
             <mu2 value="100.0"/>
             <kp value="10000000.0"/>
@@ -101,31 +125,34 @@
     <xacro:wheel prefix="right" reflect="-1"/>
 
     <!-- Front castor -->
-    <link name="castor">
+    <link name="castor_link">
         <visual>
             <geometry>
-                <sphere radius="${wheel_rad/2.0}"/>
+                <sphere radius="${castor_rad}"/>
             </geometry>
             <material name="black"/>
         </visual>
         <collision>
             <geometry>
-                <sphere radius="${wheel_rad/2.0}"/>
+                <sphere radius="${castor_rad}"/>
             </geometry>
         </collision>
         <xacro:default_inertial mass="0.5"/>
     </link>
 
     <joint name="castor_joint" type="fixed">
-        <parent link="base_link"/>
-        <child link="castor"/>
-        <origin xyz="${wheel_rad/2.0 - body_len/2.0} 0 ${-1.5*wheel_rad}" rpy="0 0 0"/>
+        <parent link="body_link"/>
+        <child link="castor_link"/>
+        <origin xyz="${castorOx} 0 ${castorOz}" rpy="0 0 0"/>
     </joint>
 
-    <gazebo reference="castor">
+    <gazebo reference="castor_link">
         <mu1 value="0.0"/>
         <mu2 value="0.0"/>
     </gazebo>
+
+    <xacro:include filename="$(find mobile_robot)/urdf/mobile_bot_camera.urdf.xacro" />
+    <xacro:include filename="$(find mobile_robot)/urdf/mobile_bot_laser.urdf.xacro" />
 
     <!-- Gazebo plugin for ROS Control -->
     <gazebo>
@@ -133,6 +160,5 @@
             <robotNamespace>/</robotNamespace>
         </plugin>
     </gazebo>
-
 
 </robot>

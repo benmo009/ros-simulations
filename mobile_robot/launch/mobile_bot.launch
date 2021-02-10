@@ -20,9 +20,8 @@
         <param name="publish_frequency" type="double" value="30.0" />
     </node>
 
-    <!-- Load controller config files to parameter server -->
-    <rosparam command="load" file="$(find mobile_robot)/config/mobile_bot_diffdrive.yaml" />
-    <rosparam command="load" file="$(find mobile_robot)/config/mobile_bot_joints.yaml" />
+    <!-- Load controller config file to parameter server -->
+    <rosparam command="load" file="$(find mobile_robot)/config/mobile_bot_control.yaml" />
 
     <!-- Load robot in rviz -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>

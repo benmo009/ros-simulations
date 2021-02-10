@@ -1,5 +1,6 @@
-# Differential Drive controller parameters
+# Configuration file for mobile bot controllers
 mobile_bot:
+  # Differential Drive controller parameters
   diff_drive_controller:
     type: "diff_drive_controller/DiffDriveController"
     publish_rate: 50
@@ -31,3 +32,8 @@ mobile_bot:
         max_velocity           : 2.0   # rad/s
         has_acceleration_limits: true
         max_acceleration       : 6.0   # rad/s^2
+
+  # The joint state controller handles publishing transforms for any moving joints  
+  joint_state_controller:
+    type: "joint_state_controller/JointStateController"
+    publish_rate: 50

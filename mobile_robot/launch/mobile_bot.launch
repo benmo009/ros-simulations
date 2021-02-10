@@ -5,11 +5,10 @@
     </include>
 
     <!-- Load robot description xacro to the parameter server -->
-    <param name="robot_description" command="$(find xacro)/xacro '$(find mobile_robot)/urdf/mobile_bot.xacro'" />
+    <param name="robot_description" command="$(find xacro)/xacro '$(find mobile_robot)/urdf/mobile_bot.urdf.xacro'" />
     
     <!-- Spawn a robot into Gazebo -->
     <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 4.5 -y -4.5 -z 1.0 -model mobile_bot" />
-
 
 
     <!-- Start robot state publisher node -->
@@ -17,16 +16,23 @@
         <param name="publish_frequency" type="double" value="30.0" />
     </node>
 
-    <!-- Start rviz -->
-
     <!-- Load diff drive config file to parameter server -->
-    <rosparam command="load" file="$(find mobile_robot)/config/mobile_bot_diffdrive.yaml" ns="mobile_bot_diff_drive_controller"/>
+    <rosparam command="load" file="$(find mobile_robot)/config/mobile_bot_diffdrive.yaml" />
+    <rosparam command="load" file="$(find mobile_robot)/config/mobile_bot_joints.yaml" />
+
+    <!-- Load robot in rviz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mobile_robot)/rviz/mobile_bot.rviz"/>
+
+
 
     <!-- Start controller spawner node -->
     <node name="mobile_bot_controller_spawner" pkg="controller_manager" type="spawner"
-        args="mobile_bot_diff_drive_controller --shutdown-timeout 3"/>
+        args="/mobile_bot/diff_drive_controller mobile_bot/joint_state_controller"/>
 
+    <!-- Starts robot steering gui -->
     <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
-        <param name="default_topic" value="/mobile_bot_diff_drive_controller/cmd_vel"/>
+        <param name="default_topic" value="/mobile_bot/diff_drive_controller/cmd_vel"/>
     </node>
+
+
 </launch>

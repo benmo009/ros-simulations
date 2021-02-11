@@ -1,6 +1,6 @@
 <launch>
     <!-- Arguments -->
-    <arg name="robot" default="$(find mobile_robot)/urdf/mobile_bot.urdf.xacro" />
+    <arg name="robot" default="$(find mobile_robot)/urdf/mobile_bot/mobile_bot.urdf.xacro" />
     <arg name="room" default="$(find mobile_robot)/urdf/room/room.urdf.xacro" />
     <arg name="rvizconfig" default="$(find mobile_robot)/rviz/mobile_bot.rviz" />
 

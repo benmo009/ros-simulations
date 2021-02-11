@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mobile_bot_imu">
+
+    <link name="imu_link">
+        <visual>
+            <geometry>
+                <box size="0.002 0.002 0.001" />
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.002 0.002 0.001" />
+            </geometry>
+        </collision>
+        <xacro:default_inertial mass="0.001" />
+    </link>
+
+    <joint name="imu_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="imu_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <gazebo>
+        <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+            <alwaysOn>true</alwaysOn>
+            <bodyName>imu_link</bodyName>
+            <topicName>imu</topicName>
+            <serviceName>imu_service</serviceName>
+            <gaussianNoise>0.0</gaussianNoise>
+            <updateRate>20.0</updateRate>
+        </plugin>
+    </gazebo>
+</robot>

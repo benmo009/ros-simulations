@@ -8,8 +8,7 @@ mobile_bot:
     left_wheel: ['left_wheel_joint']
     right_wheel: ['right_wheel_joint']
 
-    # wheel_separation: 0.45
-    
+    # Infer wheel separation and wheel radius from description files
 
     # Odometry covariances for the encoder output of the robot.
     # Tune to the robot's sample odometry data

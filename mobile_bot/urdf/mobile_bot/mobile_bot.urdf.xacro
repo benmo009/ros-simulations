@@ -157,12 +157,23 @@
     </gazebo>
 
     <!-- Camera and Laser -->
-    <xacro:include filename="$(find mobile_robot)/urdf/mobile_bot/mobile_bot_camera.urdf.xacro" />
-    <xacro:include filename="$(find mobile_robot)/urdf/mobile_bot/mobile_bot_laser.urdf.xacro" />
-    <xacro:include filename="$(find mobile_robot)/urdf/mobile_bot/mobile_bot_imu.urdf.xacro" />
+    <xacro:include filename="$(find mobile_bot)/urdf/mobile_bot/mobile_bot_camera.urdf.xacro" />
+    <xacro:include filename="$(find mobile_bot)/urdf/mobile_bot/mobile_bot_laser.urdf.xacro" />
+    <xacro:include filename="$(find mobile_bot)/urdf/mobile_bot/mobile_bot_imu.urdf.xacro" />
 
     <!-- Gazebo plugin for ROS Control -->
-    <gazebo>        
+    <gazebo> 
+        <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>20.0</updateRate>
+            <bodyName>base_link</bodyName>
+            <topicName>ground_truth/state</topicName>
+            <gaussianNoise>0.01</gaussianNoise>
+            <frameName>world</frameName>
+            <xyzOffsets>0 0 0</xyzOffsets>
+            <rpyOffsets>0 0 0</rpyOffsets>
+        </plugin>  
+
         <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
             <robotNamespace>/</robotNamespace>
         </plugin>

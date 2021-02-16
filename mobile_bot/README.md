@@ -7,6 +7,7 @@ TODO:
 - Use parameter server to store GPS noise covariance
 - Finish dead reckoning localization
 - Implement kalman filtering
+- Implement random walk
 - Implement localization with laser scanners as range sensor
 - Implement amcl
 - Implement mapping algorithms

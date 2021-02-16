@@ -1,2 +1,3 @@
-# ros-simulations
-Repo to practice simulating robots in ROS
+# ROS Simulations
+
+Just a humble repository for practicing simulating and controlling robots in ROS.

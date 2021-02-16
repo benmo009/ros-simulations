@@ -39,4 +39,6 @@
         <param name="default_topic" value="/mobile_bot/diff_drive_controller/cmd_vel"/>
     </node>
 
+    <node name="mobile_bot_gps" pkg="mobile_bot" type="noisy_gps.py" args="20 0.1"/>
+
 </launch>

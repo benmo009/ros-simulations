@@ -164,6 +164,7 @@ catkin_install_python(PROGRAMS
   scripts/plot_pose.py
   scripts/dead_reckoning.py
   scripts/laser_subscriber.py
+  scripts/noisy_gps.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

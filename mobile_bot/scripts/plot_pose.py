@@ -5,63 +5,73 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gazebo_msgs.srv import GetModelState
 from geometry_msgs.msg import Pose
-        
+from tf.transformations import euler_from_quaternion
+
+class PosePlotter:
+    def __init__(self, name):
+        # Initialize ROS node
+        rospy.init_node(name)
+
+        # Subscribe to gps topics
+        self.noisy_sub = rospy.Subscriber("/gps/noisy", Pose, self.noisy_gps_callback, queue_size=1)
+        self.true_sub = rospy.Subscriber("/gps/true", Pose, self.true_gps_callback, queue_size=1)
+
+        # Initialize dictionaries for storing gps data
+        self.noisy_data = {"t": [], "x": [], "y": [], "theta": []}
+        self.true_data = {"t": [], "x": [], "y": [], "theta": []}
+
+    # Callback function for noisy GPS data
+    def noisy_gps_callback(self, data):
+        # Store the time, x, and y positions
+        self.noisy_data["t"].append(rospy.get_time())
+        self.noisy_data["x"].append(data.position.x)
+        self.noisy_data["y"].append(data.position.y)
+
+        # Convert quaternion data to euler angles to get orientation
+        q = data.orientation
+        theta = euler_from_quaternion([q.x, q.y, q.z, q.w])
+        theta = theta[2]
+        self.noisy_data["theta"].append(theta)
+
+    # Callback function for true GPS data
+    def true_gps_callback(self, data):
+        # Store the time, x, and y positions
+        self.true_data["t"].append(rospy.get_time())
+        self.true_data["x"].append(data.position.x)
+        self.true_data["y"].append(data.position.y)
+
+        # Convert quaternion data to euler angles to get orientation
+        q = data.orientation
+        theta = euler_from_quaternion([q.x, q.y, q.z, q.w])
+        theta = theta[2]
+        self.true_data["theta"].append(theta)
+
+    # Plot the GPS data
+    def plot(self):
+        fig, ax = plt.subplots(3,1)
+        ax[0].plot(self.true_data["t"], self.true_data["x"], label="True x")
+        ax[1].plot(self.true_data["t"], self.true_data["y"], label="True y")
+        ax[2].plot(self.true_data["t"], self.true_data["theta"], label="True $\\theta$")
+
+        ax[0].plot(self.noisy_data["t"], self.noisy_data["x"], '--', label="Noisy x")
+        ax[1].plot(self.noisy_data["t"], self.noisy_data["y"], '--', label="Noisy y")
+        ax[2].plot(self.noisy_data["t"], self.noisy_data["theta"], '--', label="Noisy $\\theta$")
+
+        for i in range(3):
+            ax[i].legend()
+            ax[i].set_xlabel("Time (s)")
+            ax[i].set_ylabel("Position")
+
+        plt.tight_layout()
+        plt.show()
+            
 if __name__ == "__main__":
+    # Start plotter node
+    plotter = PosePlotter("mobile_bot_pose_plotter")
 
-    # Initialize lists for storing data
-    timestamps = []
-    x_pos = []
-    y_pos = []
-    theta_pos = []
+    # Define how long to collect data for. 
+    # TODO: Get from parameter server
+    rospy.sleep(10)
 
-    # Initialize ros node
-    rospy.init_node("model_state_client")
-
-    # Set rate of calling service to 10 Hz
-    rate = rospy.Rate(10)
-
-    # Wait for service to start
-    rospy.wait_for_service("/gazebo/get_model_state")
-
-    start_time = rospy.get_time()
-    t = start_time
-
-    while not rospy.is_shutdown() and (t - start_time) < 60:
-        try:
-            # Call the model state service
-            get_model_state = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
-            model_state = get_model_state("mobile_bot", "world")
-
-            # Get the position information
-            x = model_state.pose.position.x
-            y = model_state.pose.position.y
-            q = model_state.pose.orientation
-
-            # Get the current simulation time
-            t = rospy.get_time()
-
-            # Convert from quaternion to theta
-
-
-            timestamps.append(t)
-            x_pos.append(x)
-            y_pos.append(y)
-            rospy.loginfo("x: %.3f  y: %.3f" % (x, y))
-            rospy.loginfo("q: %.2fi + %.2fj + %.2fk + %.2f\n" % (q.x, q.y, q.z, q.w))
-            rate.sleep()
-        except rospy.ROSInterruptException:
-            pass
-    
-
-    timestamps = np.array(timestamps)
-    x_pos = np.array(x_pos)
-    y_pos = np.array(y_pos)
-
-    plt.plot(timestamps, x_pos, label="x")
-    plt.plot(timestamps, y_pos, label="y")
-    plt.legend()
-    plt.xlabel("Time (s)")
-    plt.ylabel("Position")
-
-    plt.show()
-
+    # Plot the GPS data
+    plotter.plot()

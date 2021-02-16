@@ -1,0 +1,12 @@
+<launch>
+    <!-- Include main launch file -->
+    <include file="$(find mobile_bot)/launch/mobile_bot.launch" />
+
+    <!-- gmapping node -->
+    <node name="gmapping_node" pkg="gmapping" type="slam_gmapping"
+        args="scan:=/mobile_bot/laser/scan" />
+    
+    <!-- Run random walk node -->
+
+    
+</launch>

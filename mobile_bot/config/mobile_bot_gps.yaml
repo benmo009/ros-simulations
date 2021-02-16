@@ -1,0 +1,7 @@
+mobile_bot:
+  gps:
+    publish_rate: 10 
+    noise_covariance: 0.1
+
+  plotter:
+    sample_time: 30  # Amount of time to collect data in sec

@@ -66,12 +66,21 @@ class PosePlotter:
         plt.show()
             
 if __name__ == "__main__":
-    # Start plotter node
-    plotter = PosePlotter("mobile_bot_pose_plotter")
+    try:
+        # Get sampling time from parameter server
+        if rospy.has_param("mobile_bot/plotter/sample_time"):
+            sample_time = rospy.get_param("mobile_bot/plotter/sample_time")
+        else:
+            sample_time = 30
 
-    # Define how long to collect data for. 
-    # TODO: Get from parameter server
-    rospy.sleep(10)
+        # Start plotter node
+        plotter = PosePlotter("mobile_bot_pose_plotter")
 
-    # Plot the GPS data
-    plotter.plot()
+        # Define how long to collect data for. 
+        rospy.sleep(sample_time)
+
+        # Plot the GPS data
+        plotter.plot()
+    
+    except rospy.ROSInterruptException:
+        pass

@@ -10,13 +10,13 @@ from gazebo_msgs.srv import GetModelState
 
 
 class NoisyGPS:
-    def __init__(self, name, argv=[10, 0.1]):
+    def __init__(self, name, publish_rate=10, noise_covariance=0.1):
         # Initialize ROS Node
         rospy.init_node(name)
         rospy.wait_for_service("/gazebo/get_model_state")
 
-        self.rate = rospy.Rate(float(argv[1]))  # Rate to publish pose data
-        self.noise_covariance = float(argv[2])  # Noise covariance of GPS
+        self.rate = rospy.Rate(publish_rate)  # Rate to publish pose data
+        self.noise_covariance = noise_covariance  # Noise covariance of GPS
         self.noise_std_dev = math.sqrt(self.noise_covariance)
 
         self.noisy_pub = rospy.Publisher("/gps/noisy", Pose, queue_size=1)
@@ -50,11 +50,25 @@ class NoisyGPS:
 
 
 if __name__ == "__main__":
-    myargv = rospy.myargv(sys.argv)
     try:
-        gps = NoisyGPS("mobile_bot_gps", myargv)
+        # Get GPS Parameters from parameter server
+        if rospy.has_param("mobile_bot/gps/publish_rate"):
+            # Publish rate
+            pub_rate = rospy.get_param("mobile_bot/gps/publish_rate")
+        else:
+            pub_rate = 10
+        
+        if rospy.has_param("mobile_bot/gps/noise_covariance"):
+            # GPS noise covariance
+            noise_cov = rospy.get_param("mobile_bot/gps/noise_covariance")
+        else:
+            noise_cov = 0.1
+        
+        # Run the GPS node
+        gps = NoisyGPS("mobile_bot_gps", pub_rate, noise_cov)
         while not rospy.is_shutdown():
             gps.get_pose_and_pub()
             gps.sleep()
+
     except rospy.ROSInterruptException:
         pass

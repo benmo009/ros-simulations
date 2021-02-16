@@ -8,10 +8,18 @@ project(mobile_bot)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  controller_manager
+  gazebo_msgs
+  gazebo_ros
   geometry_msgs
+  nav_msgs
+  robot_state_publisher
   roscpp
   rospy
-  std_msgs
+  rqt_robot_steering
+  rviz
+  sensor_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -21,7 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -163,8 +171,8 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/plot_pose.py
   scripts/dead_reckoning.py
-  scripts/laser_subscriber.py
   scripts/noisy_gps.py
+  scripts/random_walk.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

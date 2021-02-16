@@ -1,0 +1,7 @@
+<launch>
+    <!-- Include the main launch file -->
+    <include file="$(find mobile_bot)/launch/mobile_bot.launch" />
+
+    <!-- Mobile bot position plotter -->
+    <node name="mobile_bot_plotter" pkg="mobile_bot" type="plot_pose.py"/>
+</launch>

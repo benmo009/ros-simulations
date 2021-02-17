@@ -1,22 +1,25 @@
 import rospy
 from sensor_msgs.msg import LaserScan
+from std_msgs.msg import Bool
 import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-def test_func():
-    rospy.loginfo("This test works")
-
 class ProximitySensor:
-    def __init__(self, name):
+    def __init__(self, name, tolerance=0.7):
         # Initialize ROS Node
         rospy.init_node(name)
 
+        self.tolerance = tolerance
+
         # Start laser subscriber
         self.sub = rospy.Subscriber("/mobile_bot/laser/scan", LaserScan, self.laser_callback, queue_size=1)
+        # Start publisher
+        self.pub = rospy.Publisher("/mobile_bot/proximity_sensor", Bool, queue_size=1)
 
         # Stop flag
-        self.stop = False
+        self.stop = Bool()
+        self.stop.data = False
 
     # Radian and degree conversion functions
     def radian_to_degree(self, angle):
@@ -46,15 +49,17 @@ class ProximitySensor:
 
         distances = ranges[idx]
 
-        proximity = np.argwhere(distances <= 0.2)
+        proximity = np.argwhere(distances <= self.tolerance)
 
         # Set stop flag 
         if proximity.size > 0:
             print("\nTOO CLOSE!!\n")
-            self.stop = True
+            self.stop.data = True
         else:
             print("You're good, keep going")
-            self.stop = False
+            self.stop.data = False
+
+        self.pub.publish(self.stop)
 
     def check_stop(self):
         return self.stop

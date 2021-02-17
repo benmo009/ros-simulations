@@ -68,6 +68,7 @@
   <exec_depend>rqt_robot_steering</exec_depend>
   <exec_depend>rviz</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
   <exec_depend>tf</exec_depend>
 
 

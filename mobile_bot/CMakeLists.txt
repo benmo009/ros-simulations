@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   rqt_robot_steering
   rviz
   sensor_msgs
+  std_msgs
   tf
 )
 
@@ -173,6 +174,7 @@ catkin_install_python(PROGRAMS
   scripts/dead_reckoning.py
   scripts/noisy_gps.py
   scripts/random_walk.py
+  scripts/mobile_bot_proximity_sensor.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

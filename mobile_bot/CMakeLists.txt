@@ -170,11 +170,11 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/plot_pose.py
-  scripts/dead_reckoning.py
-  scripts/noisy_gps.py
-  scripts/random_walk.py
+  scripts/mobile_bot_noisy_gps.py
   scripts/mobile_bot_proximity_sensor.py
+  scripts/mobile_bot_odometry_sub.py
+  scripts/random_walk.py
+  scripts/plot_pose.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

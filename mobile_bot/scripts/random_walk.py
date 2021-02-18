@@ -31,7 +31,7 @@ class VelocityController:
             self.vel_msg.linear.x = 0
 
             # direction = self.random_direction()
-            self.vel_msg.angular.z = 0.1
+            self.vel_msg.angular.z = 0.3
         else:
             self.vel_msg.linear.x = 0.3
             self.vel_msg.angular.z = 0

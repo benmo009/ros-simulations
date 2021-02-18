@@ -22,13 +22,15 @@ class NoisyGPS:
         self.noisy_pub = rospy.Publisher("/gps/noisy", Pose, queue_size=1)
         self.true_pub = rospy.Publisher("/gps/true", Pose, queue_size=1)
 
+        # Connect to gazebo model_state service
+        self.get_model_state = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
+
         self.noisy_pose = Pose()
         self.true_pose = Pose()
     
     def get_pose_and_pub(self):
         # Call the model state service
-        get_model_state = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
-        model_state = get_model_state("mobile_bot", "world")
+        model_state = self.get_model_state("mobile_bot", "world")
 
         self.true_pose = model_state.pose
         self.add_noise()

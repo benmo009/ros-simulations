@@ -1,0 +1,9 @@
+<launch>
+    <!-- Include main launch file -->
+    <include file="$(find mobile_bot)/launch/mobile_bot.launch" />
+
+    <!-- Starts robot steering gui -->
+    <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+        <param name="default_topic" value="/mobile_bot/diff_drive_controller/cmd_vel"/>
+    </node>
+</launch>

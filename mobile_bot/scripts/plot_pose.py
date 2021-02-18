@@ -15,10 +15,12 @@ class PosePlotter:
         # Subscribe to gps topics
         self.noisy_sub = rospy.Subscriber("/gps/noisy", Pose, self.noisy_gps_callback, queue_size=1)
         self.true_sub = rospy.Subscriber("/gps/true", Pose, self.true_gps_callback, queue_size=1)
+        self.odom_sub = rospy.Subscriber("/mobile_bot/estimated_pose", Pose, self.odom_callback, queue_size=1)
 
         # Initialize dictionaries for storing gps data
         self.noisy_data = {"t": [], "x": [], "y": [], "theta": []}
         self.true_data = {"t": [], "x": [], "y": [], "theta": []}
+        self.odom_data = {"t": [], "x": [], "y": [], "theta": []}
 
     # Callback function for noisy GPS data
     def noisy_gps_callback(self, data):
@@ -46,6 +48,12 @@ class PosePlotter:
         theta = theta[2]
         self.true_data["theta"].append(theta)
 
+    def odom_callback(self, data):
+        self.odom_data["t"].append(rospy.get_time())
+        self.odom_data["x"].append(data.position.x)
+        self.odom_data["y"].append(data.position.y)
+        self.odom_data["theta"].append(data.orientation.x)
+
     # Plot the GPS data
     def plot(self):
         fig, ax = plt.subplots(3,1)
@@ -56,6 +64,10 @@ class PosePlotter:
         ax[0].plot(self.noisy_data["t"], self.noisy_data["x"], '--', label="Noisy x")
         ax[1].plot(self.noisy_data["t"], self.noisy_data["y"], '--', label="Noisy y")
         ax[2].plot(self.noisy_data["t"], self.noisy_data["theta"], '--', label="Noisy $\\theta$")
+
+        ax[0].plot(self.odom_data["t"], self.odom_data["x"], '--', label="Odom x")
+        ax[1].plot(self.odom_data["t"], self.odom_data["y"], '--', label="Odom y")
+        ax[2].plot(self.odom_data["t"], self.odom_data["theta"], '--', label="Odom $\\theta$")
 
         for i in range(3):
             ax[i].legend()

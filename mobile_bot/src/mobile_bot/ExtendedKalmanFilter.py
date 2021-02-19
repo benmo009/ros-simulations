@@ -40,13 +40,15 @@ class ExtendedKalmanFilter:
         B_transpose = np.transpose(B_matrix)
         C_transpose = np.transpose(C_matrix)
 
+        if np.linalg.det(self.V) != 0:
+            V_inv = np.linalg.inv(self.V)
+        else:
+            V_inv = np.zeros((1,1))
+
         # Compute K
         self.Sigma = A_matrix @ self.P @ A_transpose + B_matrix @ self.W @ B_transpose
-        self.P = np.linalg.inv( self.Sigma + C_transpose @ self.V @ C_matrix )
-        if np.linalg.det(self.V) == 0:
-            self.K = np.zeros((3,1))
-        else:
-            self.K = self.P @ C_transpose @ np.linalg.inv(self.V)
+        self.P = np.linalg.inv( np.linalg.inv(self.Sigma) + C_transpose @ V_inv @ C_matrix )
+        self.K = self.P @ C_transpose @ V_inv
 
         # Compute next q_hat
         self.q_hat = self.q_bar + self.K * (y - self.h(self.q_bar))

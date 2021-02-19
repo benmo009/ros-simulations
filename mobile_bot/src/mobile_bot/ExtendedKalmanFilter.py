@@ -2,6 +2,7 @@
 
 import math
 import numpy as np
+from numpy.linalg import inv, det
 
 class ExtendedKalmanFilter:
     # Extended Kalman Filter Constructor
@@ -18,10 +19,8 @@ class ExtendedKalmanFilter:
         self.W = W  # Covariance matrix for input command u, (2 x 2)
         self.P = P0  # Covariance matrix for initial state q, (3 x 3)
         self.q_hat = q0  # Initial state guess, (3 x 1)
-
-        
-    # Takes the current input and output of the state and returns the new
-    # estimated state
+  
+    # Takes the current input and output and returns the new estimated state
     def estimate(self, y, u):
         # Get q_bar, the open loop estimate
         self.q_bar = self.f(self.q_hat, u)
@@ -35,15 +34,14 @@ class ExtendedKalmanFilter:
         B_tran = np.transpose(B_mat)
         C_tran = np.transpose(C_mat)
 
-        if np.linalg.det(self.V) != 0:
-            V_inv = np.linalg.inv(self.V)
+        if det(self.V) != 0:
+            V_inv = inv(self.V)
         else:
             V_inv = np.zeros((1,1))
 
         # Compute K
         self.Sigma = A_mat @ self.P @ A_tran + B_mat @ self.W @ B_tran
-        S_inv = np.linalg.inv(self.Sigma)
-        self.P = np.linalg.inv( S_inv + C_tran @ V_inv @ C_mat )
+        self.P = inv( inv(self.Sigma) + C_tran @ V_inv @ C_mat )
         self.K = self.P @ C_tran @ V_inv
 
         # Compute next q_hat

@@ -8,7 +8,7 @@
     </xacro:sensor_d435>
 
     <xacro:property name="link_name" value="camera_link" />
-    <xacro:property name="camera_name" value="realsense2_d435" />
+    <xacro:property name="camera_name" value="camera" />
     
     <!-- Gazebo Sensor Plugin for Depth Camera -->
     <gazebo reference="${link_name}">

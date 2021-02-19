@@ -77,7 +77,7 @@ class RangeSensor:
         y_range = self.sensor_pos[1]
         vec_to_robot = self.sensor_pos - q[0:2]
 
-        p = vec_to_robot / np.linalg.norm(vec_to_robot)
+        p = -vec_to_robot / np.linalg.norm(vec_to_robot)
         p.shape = (2,)
         Ck[0, 0:2] = p
         return Ck

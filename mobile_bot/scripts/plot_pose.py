@@ -15,12 +15,14 @@ class PosePlotter:
         # Subscribe to gps topics
         self.noisy_sub = rospy.Subscriber("/gps/noisy", Pose, self.noisy_gps_callback, queue_size=1)
         self.true_sub = rospy.Subscriber("/gps/true", Pose, self.true_gps_callback, queue_size=1)
-        self.odom_sub = rospy.Subscriber("/mobile_bot/estimated_pose", Pose, self.odom_callback, queue_size=1)
+        self.odom_sub = rospy.Subscriber("/mobile_bot/dead_reckoning", Pose, self.odom_callback, queue_size=1)
+        self.odom_sub = rospy.Subscriber("/mobile_bot/range_sensor", Pose, self.range_callback, queue_size=1)
 
         # Initialize dictionaries for storing gps data
         self.noisy_data = {"t": [], "x": [], "y": [], "theta": []}
         self.true_data = {"t": [], "x": [], "y": [], "theta": []}
         self.odom_data = {"t": [], "x": [], "y": [], "theta": []}
+        self.range_data = {"t": [], "x": [], "y": [], "theta": []}
 
     # Callback function for noisy GPS data
     def noisy_gps_callback(self, data):
@@ -54,6 +56,12 @@ class PosePlotter:
         self.odom_data["y"].append(data.position.y)
         self.odom_data["theta"].append(data.orientation.x)
 
+    def range_callback(self, data):
+        self.range_data["t"].append(rospy.get_time())
+        self.range_data["x"].append(data.position.x)
+        self.range_data["y"].append(data.position.y)
+        self.range_data["theta"].append(data.orientation.x)
+
     # Plot the GPS data
     def plot(self):
         fig, ax = plt.subplots(3,1)
@@ -61,13 +69,17 @@ class PosePlotter:
         ax[1].plot(self.true_data["t"], self.true_data["y"], label="True y")
         ax[2].plot(self.true_data["t"], self.true_data["theta"], label="True $\\theta$")
 
-        ax[0].plot(self.noisy_data["t"], self.noisy_data["x"], '--', label="Noisy x")
-        ax[1].plot(self.noisy_data["t"], self.noisy_data["y"], '--', label="Noisy y")
-        ax[2].plot(self.noisy_data["t"], self.noisy_data["theta"], '--', label="Noisy $\\theta$")
+        # ax[0].plot(self.noisy_data["t"], self.noisy_data["x"], '--', label="Noisy x")
+        # ax[1].plot(self.noisy_data["t"], self.noisy_data["y"], '--', label="Noisy y")
+        # ax[2].plot(self.noisy_data["t"], self.noisy_data["theta"], '--', label="Noisy $\\theta$")
 
         ax[0].plot(self.odom_data["t"], self.odom_data["x"], '--', label="Odom x")
         ax[1].plot(self.odom_data["t"], self.odom_data["y"], '--', label="Odom y")
         ax[2].plot(self.odom_data["t"], self.odom_data["theta"], '--', label="Odom $\\theta$")
+
+        ax[0].plot(self.range_data["t"], self.range_data["x"], '--', label="Range x")
+        ax[1].plot(self.range_data["t"], self.range_data["y"], '--', label="Range y")
+        ax[2].plot(self.range_data["t"], self.range_data["theta"], '--', label="Range $\\theta$")
 
         for i in range(3):
             ax[i].legend()

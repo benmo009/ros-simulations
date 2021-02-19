@@ -1,0 +1,12 @@
+mobile_bot:
+  range_sensors:
+    noise_covariance: [
+      0.001
+    ]
+
+  initial_state:
+    noise_covariance: [
+      0.1,
+      0.1,
+      0.1
+    ]

@@ -15,7 +15,7 @@ from mobile_bot import RangeSensor
 if __name__ == "__main__":
     try:
         # Get sensor location from parameter server
-        r = RangeSensor.RangeSensor("range_sensor", [10,0], 0.001)
+        r = RangeSensor.RangeSensor("range_sensor", [10,0], 0.01)
         while not rospy.is_shutdown():
             r.estimate_and_publish_state()
     except rospy.ROSInterruptException:

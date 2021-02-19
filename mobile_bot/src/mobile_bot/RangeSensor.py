@@ -24,6 +24,12 @@ class RangeSensor:
         # Initialize ros node
         rospy.init_node(name)
 
+        # Get the robot's initial position
+        self.state = mobile_bot.get_initial_state()
+        print("Initial State:", self.state)
+        # Initialize input command vector
+        self.input_command = np.zeros((2,1))
+
         # Subscribe to gps topic to get robot's position
         self.gps_sub = rospy.Subscriber("/gps/true", Pose, self.gps_callback)
         # Subscribe to differential drive controller odometry to get input command
@@ -46,11 +52,6 @@ class RangeSensor:
         self.sensor_noise = sensor_noise * np.eye(1)  # V
         self.noise_std_dev = math.sqrt(sensor_noise)
 
-        # Get the robot's initial position
-        self.state = mobile_bot.get_initial_state()
-        print("Initial State:", self.state)
-        # Initialize input command vector
-        self.input_command = np.zeros((2,1))
 
         # Initialize sensor data
         self.sensor_data = 0

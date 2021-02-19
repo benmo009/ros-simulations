@@ -42,7 +42,7 @@
 
     <!-- Odometry subscriber for dead reckoning -->
     <node name="mobile_bot_dead_reckoning" pkg="mobile_bot" type="mobile_bot_dead_reckoning.py" />
-    <!-- <node name="mobile_bot_range_sensor" pkg="mobile_bot" type="range_sensors.py" /> -->
+    <node name="mobile_bot_range_sensor" pkg="mobile_bot" type="range_sensors.py" />
 
     <!-- Start Proximity sensor node -->
     <node name="mobile_bot_proximity_sensor" pkg="mobile_bot" type="mobile_bot_proximity_sensor.py" />

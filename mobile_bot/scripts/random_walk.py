@@ -10,6 +10,7 @@ from numpy.random import random
 class VelocityController:
     def __init__(self, name):
         rospy.init_node(name)
+        rospy.sleep(3)
 
         self.sub = rospy.Subscriber("/mobile_bot/proximity_sensor", Bool, self.proximity_callback)
         self.vel_pub = rospy.Publisher("/mobile_bot/diff_drive_controller/cmd_vel", Twist, queue_size=1)
@@ -29,12 +30,14 @@ class VelocityController:
 
         if stop.data == True:
             self.vel_msg.linear.x = 0
-
-            # direction = self.random_direction()
             self.vel_msg.angular.z = 0.3
         else:
-            self.vel_msg.linear.x = 0.3
+            self.vel_msg.linear.x = 0.5
             self.vel_msg.angular.z = 0
+
+            # add a random turn
+            direction = self.random_direction()
+            self.vel_msg.angular.z = direction * random()/ 10
 
         self.vel_pub.publish(self.vel_msg)
     

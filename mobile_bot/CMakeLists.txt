@@ -173,7 +173,6 @@ catkin_install_python(PROGRAMS
   scripts/mobile_bot_dead_reckoning.py
   scripts/mobile_bot_noisy_gps.py
   scripts/mobile_bot_proximity_sensor.py
-  scripts/mobile_bot_odometry_sub.py
   scripts/random_walk.py
   scripts/plot_pose.py
   scripts/range_sensors.py

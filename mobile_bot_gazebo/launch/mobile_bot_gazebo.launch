@@ -1,0 +1,27 @@
+<launch>
+    <!-- Arguments -->
+    <arg name="room_name" default="room" />
+    <arg name="robot" default="$(find mobile_bot_description)/urdf/mobile_bot/mobile_bot.urdf.xacro" />
+    <arg name="world" default="$(find mobile_bot_gazebo)/urdf/$(arg room_name).urdf.xacro" />
+
+    <!-- Start Gazebo -->
+    <!-- Load the empty world from gazebo_ros package -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find mobile_bot_gazebo)/world/top_down_cam.world"/>
+    </include>
+
+    <!-- Load robot description xacro to the parameter server -->
+    <param name="robot_description" command="$(find xacro)/xacro $(arg robot)" />
+    <param name="room_description" command="$(find xacro)/xacro $(arg world)" />
+
+    <!-- Load information about the room to parameter server -->
+    <rosparam command="load" file="$(find mobile_bot_gazebo)/config/$(arg room_name).yaml" />
+
+    <!-- Spawn the robot into Gazebo -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" 
+        args="-param robot_description -urdf -x 1.0 -y 1.0 -z 1.0 -model mobile_bot" />
+    <!-- Spawn room model into Gazebo -->
+    <node name="spawn_room" pkg="gazebo_ros" type="spawn_model" 
+        args="-param room_description -urdf -model room" />
+    
+</launch>

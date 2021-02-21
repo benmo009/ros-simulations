@@ -157,9 +157,9 @@
     </gazebo>
 
     <!-- Camera and Laser -->
-    <xacro:include filename="$(find mobile_bot)/urdf/mobile_bot/mobile_bot_camera.urdf.xacro" />
-    <xacro:include filename="$(find mobile_bot)/urdf/mobile_bot/mobile_bot_laser.urdf.xacro" />
-    <xacro:include filename="$(find mobile_bot)/urdf/mobile_bot/mobile_bot_imu.urdf.xacro" />
+    <xacro:include filename="$(find mobile_bot_description)/urdf/mobile_bot/mobile_bot_camera.urdf.xacro" />
+    <xacro:include filename="$(find mobile_bot_description)/urdf/mobile_bot/mobile_bot_laser.urdf.xacro" />
+    <xacro:include filename="$(find mobile_bot_description)/urdf/mobile_bot/mobile_bot_imu.urdf.xacro" />
 
     <!-- Gazebo plugin for ROS Control -->
     <gazebo> 

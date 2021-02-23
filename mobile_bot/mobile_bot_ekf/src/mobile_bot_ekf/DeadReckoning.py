@@ -11,8 +11,8 @@ import rospy
 import math
 import numpy as np
 from numpy.random import normal
-from mobile_bot import ExtendedKalmanFilter as EKF
-from mobile_bot import mobile_bot_helpers as mobile_bot
+from mobile_bot_ekf import ExtendedKalmanFilter as EKF
+from mobile_bot_ekf import mobile_bot_helpers as mobile_bot
 from gazebo_msgs.srv import GetModelState
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from mobile_bot import NoisyGPS
+from mobile_bot_ekf import NoisyGPS
 
 
 if __name__ == "__main__":

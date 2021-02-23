@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from mobile_bot import ProximitySensor
+from mobile_bot_ekf import ProximitySensor
 
 if __name__ == "__main__":
     try:

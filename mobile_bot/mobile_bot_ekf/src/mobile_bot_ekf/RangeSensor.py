@@ -15,8 +15,8 @@ import math
 import numpy as np
 from numpy.random import normal
 from geometry_msgs.msg import Pose
-from mobile_bot import ExtendedKalmanFilter as EKF 
-from mobile_bot import mobile_bot_helpers as mobile_bot
+from mobile_bot_ekf import ExtendedKalmanFilter as EKF 
+from mobile_bot_ekf import mobile_bot_helpers as mobile_bot
 from nav_msgs.msg import Odometry
 
 class RangeSensor:

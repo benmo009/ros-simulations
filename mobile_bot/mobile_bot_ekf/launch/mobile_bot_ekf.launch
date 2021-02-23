@@ -1,0 +1,15 @@
+<launch>
+    <!-- Import main launch file -->
+    <include file="$(find mobile_bot)/launch/mobile_bot.launch"/>
+
+    <!-- Mobile bot GPS -->
+    <rosparam command="load" file="$(find mobile_bot_ekf)/config/mobile_bot_gps.yaml" />
+    <node name="mobile_bot_gps" pkg="mobile_bot_ekf" type="mobile_bot_noisy_gps.py"/>
+
+    <!-- Odometry subscriber for dead reckoning -->
+    <node name="mobile_bot_dead_reckoning" pkg="mobile_bot_ekf" type="mobile_bot_dead_reckoning.py" />
+    <node name="mobile_bot_range_sensor" pkg="mobile_bot_ekf" type="range_sensors.py" />
+
+    <!-- Mobile bot position plotter -->
+    <node name="mobile_bot_plotter" pkg="mobile_bot_ekf" type="plot_pose.py"/>
+</launch>

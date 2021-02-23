@@ -2,7 +2,7 @@
 
 import rospy
 import numpy as np
-from mobile_bot import DeadReckoning
+from mobile_bot_ekf import DeadReckoning
 
 if __name__ == "__main__":
     try:

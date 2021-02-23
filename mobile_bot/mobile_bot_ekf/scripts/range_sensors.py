@@ -10,7 +10,7 @@
 
 import rospy
 import numpy as np
-from mobile_bot import RangeSensor
+from mobile_bot_ekf import RangeSensor
 
 if __name__ == "__main__":
     try:

@@ -22,17 +22,4 @@
         args="/mobile_bot/diff_drive_controller 
               /mobile_bot/joint_state_controller"/>
 
-    <!-- Mobile bot GPS -->
-    <rosparam command="load" file="$(find mobile_bot)/config/mobile_bot_gps.yaml" />
-    <node name="mobile_bot_gps" pkg="mobile_bot" type="mobile_bot_noisy_gps.py"/>
-
-    <!-- Odometry subscriber for dead reckoning -->
-    <node name="mobile_bot_dead_reckoning" pkg="mobile_bot" type="mobile_bot_dead_reckoning.py" />
-    <node name="mobile_bot_range_sensor" pkg="mobile_bot" type="range_sensors.py" />
-
-    <!-- Start Proximity sensor node -->
-    <node name="mobile_bot_proximity_sensor" pkg="mobile_bot" type="mobile_bot_proximity_sensor.py" />
-
-    <!-- Mobile bot position plotter -->
-    <node name="mobile_bot_plotter" pkg="mobile_bot" type="plot_pose.py"/>
 </launch>

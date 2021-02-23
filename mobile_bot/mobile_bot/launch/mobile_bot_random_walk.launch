@@ -2,6 +2,9 @@
     <!-- Include main launch file -->
     <include file="$(find mobile_bot)/launch/mobile_bot.launch" />
 
+    <!-- Start Proximity sensor node -->
+    <node name="mobile_bot_proximity_sensor" pkg="mobile_bot" type="mobile_bot_proximity_sensor.py" />
+
     <!-- Start random walk node -->
     <node name="mobile_bot_random_walk" pkg="mobile_bot" type="random_walk.py" />
 

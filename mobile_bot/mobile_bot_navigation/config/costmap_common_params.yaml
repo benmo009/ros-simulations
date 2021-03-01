@@ -1,0 +1,22 @@
+obstacle_range: 0.5  #3.0
+raytrace_range: 1.0  #3.5
+
+#footprint: [[x0, y0], [x1, y1], ... [xn, yn]]
+#footprint: [[0.2,0.4], [-0.8, 0.4], [-0.8,-0.4], [0.2,-0.4]]
+#alt: ir of robot:
+robot_radius: 0.3  # 0.8
+inflation_radius: 1.0
+
+observation_sources: laser_scan_sensor #point_cloud_sensor
+
+laser_scan_sensor: {  sensor_frame: laser_link, 
+                      data_type: LaserScan, 
+                      topic: /mobile_bot/laser/scan, 
+                      marking: true, 
+                      clearing: true}
+
+# point_cloud_sensor: { sensor_frame: camera_link, 
+#                       data_type: PointCloud2, 
+#                       topic: /mobile_bot/camera/depth/points, 
+#                       marking: true, 
+#                       clearing: true}

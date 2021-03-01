@@ -1,6 +1,10 @@
 <launch>
+    <arg name="rvizconfig" default="$(find mobile_bot)/rviz/mobile_bot.rviz" />
+
     <!-- Include main launch file -->
-    <include file="$(find mobile_bot)/launch/mobile_bot.launch" />
+    <include file="$(find mobile_bot)/launch/mobile_bot.launch">
+        <arg name="rvizconfig" value="$(arg rvizconfig)" />
+    </include>
 
     <!-- Starts robot steering gui -->
     <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">

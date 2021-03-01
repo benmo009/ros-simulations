@@ -36,7 +36,7 @@
                 <depthImageTopicName>/mobile_bot/${camera_name}/depth/image_raw</depthImageTopicName>
                 <depthImageInfoTopicName>/mobile_bot/${camera_name}/depth/camera_info</depthImageInfoTopicName>
                 <pointCloudTopicName>/mobile_bot/${camera_name}/depth/points</pointCloudTopicName>
-                <frameName>${link_name}</frameName>
+                <frameName>${camera_name}_depth_frame</frameName>
                 <pointCloudCutoff>0.5</pointCloudCutoff>
                 <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
                 <distortionK1>0.00000001</distortionK1>

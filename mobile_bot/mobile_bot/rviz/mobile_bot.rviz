@@ -32,7 +32,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -191,6 +191,14 @@ Visualization Manager:
           Value: true
         laser_mount_link:
           Value: false
+        left_wheel_link:
+          Value: true
+        map:
+          Value: true
+        odom:
+          Value: true
+        right_wheel_link:
+          Value: true
       Marker Alpha: 1
       Marker Scale: 0.5
       Name: TF
@@ -219,7 +227,14 @@ Visualization Manager:
             laser_mount_link:
               laser_link:
                 {}
+            left_wheel_link:
+              {}
+            right_wheel_link:
+              {}
           imu_link:
+            {}
+        map:
+          odom:
             {}
       Update Interval: 0
       Value: true
@@ -333,7 +348,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.35370972752571106
+      Distance: 5.812494277954102
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -349,9 +364,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7897974848747253
+      Pitch: 1.0447973012924194
       Target Frame: <Fixed Frame>
-      Yaw: 0.523569643497467
+      Yaw: 3.1635701656341553
     Saved: ~
 Window Geometry:
   Displays:

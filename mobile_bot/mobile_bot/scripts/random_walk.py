@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import rospy
-# from mobile_bot import ProximitySensor
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 import numpy as np

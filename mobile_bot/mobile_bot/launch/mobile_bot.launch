@@ -8,7 +8,7 @@
 
     <!-- Start robot state publisher node -->
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
-        <param name="publish_frequency" type="double" value="30.0" />
+        <param name="publish_frequency" type="double" value="10.0" />
     </node>
 
     <!-- Load controller config file to parameter server -->
@@ -27,5 +27,7 @@
     
     <node name="depth_camera_broadcaster" pkg="tf" type="static_transform_publisher"
         args="0 0 0 -1.57079632679 0 -1.57079632679 camera_link camera_depth_frame 100" />
+
+    <node name="mobile_bot_diff_drive_control" pkg="mobile_bot" type="diff_drive_control.py" />
 
 </launch>

@@ -1,6 +1,6 @@
 <launch>
 
-    <include file="$(find mobile_bot)/launch/mobile_bot_teleop.launch">
+    <include file="$(find mobile_bot)/launch/mobile_bot.launch">
         <arg name="rvizconfig" value="$(find mobile_bot_navigation)/rviz/mobile_bot_costmap.rviz" />
     </include>
 

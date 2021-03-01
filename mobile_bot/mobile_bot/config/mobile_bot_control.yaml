@@ -3,7 +3,7 @@ mobile_bot:
   # Differential Drive controller parameters
   diff_drive_controller:
     type: "diff_drive_controller/DiffDriveController"
-    publish_rate: 50
+    publish_rate: 10 # 50
 
     left_wheel: ['left_wheel_joint']
     right_wheel: ['right_wheel_joint']
@@ -35,4 +35,4 @@ mobile_bot:
   # The joint state controller handles publishing transforms for any moving joints  
   joint_state_controller:
     type: "joint_state_controller/JointStateController"
-    publish_rate: 50
+    publish_rate: 10 # 50

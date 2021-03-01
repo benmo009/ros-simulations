@@ -8,19 +8,11 @@ project(mobile_bot)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  controller_manager
-  gazebo_msgs
-  gazebo_ros
   geometry_msgs
-  nav_msgs
-  robot_state_publisher
   roscpp
   rospy
-  rqt_robot_steering
-  rviz
   sensor_msgs
   std_msgs
-  tf
 )
 
 ## System dependencies are found with CMake's conventions

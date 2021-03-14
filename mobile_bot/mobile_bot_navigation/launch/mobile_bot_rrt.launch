@@ -1,0 +1,9 @@
+<launch>
+
+    <node name="map_server" pkg="map_server" type="map_server" 
+    args="$(find mobile_bot_navigation)/maps/costmap/costmap.yaml">
+        <remap from="/map" to="/costmap"/>
+    </node>
+
+    
+</launch>

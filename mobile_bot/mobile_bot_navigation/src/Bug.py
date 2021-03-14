@@ -11,7 +11,7 @@ from enum import Enum
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 import matplotlib.pyplot as plt
 
-class Bug1:
+class Bug:
     def __init__(self):
         # Initialize ros node and any subscribers/publishers needed
         rospy.init_node("bug1_node")

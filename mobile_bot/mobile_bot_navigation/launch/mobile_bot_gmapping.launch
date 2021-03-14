@@ -1,5 +1,7 @@
 <launch>
-    <include file="$(find mobile_bot)/launch/mobile_bot_teleop.launch"/>
+    <include file="$(find mobile_bot)/launch/mobile_bot_teleop.launch">
+        <arg name="gazebo_gui" value="false" />
+    </include>
         <!-- <arg name="rvizconfig" value="$(find mobile_bot_navigation)/rviz/mobile_bot_mapping.rviz" />
     </include> -->
 

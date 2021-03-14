@@ -1,9 +1,11 @@
 <launch>
     <arg name="rvizconfig" default="$(find mobile_bot)/rviz/mobile_bot.rviz" />
+    <arg name="gazebo_gui" default="true" />
 
     <!-- Include main launch file -->
     <include file="$(find mobile_bot)/launch/mobile_bot.launch">
         <arg name="rvizconfig" value="$(arg rvizconfig)" />
+        <arg name="gazebo_gui" value="$(arg gazebo_gui)" />
     </include>
 
     <!-- Starts robot steering gui -->

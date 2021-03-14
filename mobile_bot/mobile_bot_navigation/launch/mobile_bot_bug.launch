@@ -1,18 +1,22 @@
 <launch>
 
     <include file="$(find mobile_bot)/launch/mobile_bot_teleop.launch">
-        <arg name="rvizconfig" value="$(find mobile_bot_navigation)/rviz/mobile_bot_costmap.rviz" />
+        <arg name="rvizconfig" value="$(find mobile_bot_navigation)/rviz/mobile_bot_bug.rviz" />
         <arg name="gazebo_gui" value="false" />
     </include>
 
-    <!-- Run the map server and load the starting-pen map -->
+
     <node name="map_server" pkg="map_server" type="map_server" 
-    args="$(find mobile_bot_navigation)/maps/room_map.yaml"/>
+    args="$(find mobile_bot_navigation)/maps/costmap/costmap.yaml">
+        <remap from="/map" to="/costmap"/>
+    </node>
 
     <!-- run robot localization -->
     <include file="$(find mobile_bot_ekf)/launch/mobile_bot_robot_localization_ekf.launch"/>
 
 
+    <node name="proximity_sensor" pkg="mobile_bot" type="ProximitySensor.py"/>
+    <node name="costmap_subscriber" pkg="mobile_bot_navigation" type="CostMapSubscriber.py" />
 
     <!-- Run Move Base -->
     <node name="move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
@@ -23,6 +27,5 @@
         <rosparam file="$(find mobile_bot_navigation)/config/global_costmap_params.yaml" command="load"/>
         <remap from="/odom" to="/odometry/filtered"/>
     </node>
-
 
 </launch>

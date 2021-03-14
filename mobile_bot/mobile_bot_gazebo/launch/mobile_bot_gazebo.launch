@@ -3,7 +3,7 @@
     <arg name="room_name" default="room" />
     <arg name="robot" default="$(find mobile_bot_description)/urdf/mobile_bot/mobile_bot.urdf.xacro" />
     <arg name="world" default="$(find mobile_bot_gazebo)/urdf/$(arg room_name).urdf.xacro" />
-    <arg name="gui" default="false" />
+    <arg name="gui" default="true" />
 
     <!-- Start Gazebo -->
     <!-- Load the empty world from gazebo_ros package -->

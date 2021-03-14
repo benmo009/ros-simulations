@@ -1,9 +1,12 @@
 <launch>
     <!-- Arguments -->
     <arg name="rvizconfig" default="$(find mobile_bot)/rviz/mobile_bot.rviz" />
+    <arg name="gazebo_gui" default="true" />
 
     <!-- Start Gazebo -->
-    <include file="$(find mobile_bot_gazebo)/launch/mobile_bot_gazebo.launch"/>
+    <include file="$(find mobile_bot_gazebo)/launch/mobile_bot_gazebo.launch">
+        <arg name="gui" value="$(arg gazebo_gui)" />
+    </include>
 
 
     <!-- Start robot state publisher node -->

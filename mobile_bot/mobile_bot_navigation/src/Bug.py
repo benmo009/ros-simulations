@@ -10,6 +10,7 @@ import numpy as np
 from enum import Enum
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 import matplotlib.pyplot as plt
+from visualization_msgs.msg import Marker
 
 class Bug:
     def __init__(self):
@@ -20,8 +21,9 @@ class Bug:
         self.odom_sub = rospy.Subscriber("/odometry/filtered", Odometry, self.odom_callback)
         self.prox_sub = rospy.Subscriber("/mobile_bot/proximity_sensor", LaserScan, self.prox_callback)
         self.vel_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=0)
+        self.goal_marker_pub = rospy.Publisher("/goal_marker", Marker, queue_size=0)
+        rospy.wait_for_message("/odometry/filtered", Odometry)
 
-        print('here1')
 
         # Initialize states
         self.states = Enum("STATES", "QUERY_GOAL TURN DRIVE FOLLOW_OBSTACLE")
@@ -30,9 +32,7 @@ class Bug:
         self.near_object = False
         self.object_detected = False
         self.goal_reached = False
-
-        print('here4')
-    
+   
         # Run the main loop
         self.main_loop()
     
@@ -69,7 +69,24 @@ class Bug:
                 self.stop()
                 self.follow_obstacle()
 
-                    
+
+        # Publish marker for rviz
+        goal_marker = Marker()
+        goal_marker.type = Marker.ARROW
+        goal_marker.action = Marker.ADD
+        goal_marker.pose.orientation.y = math.sqrt(2) / 2
+        goal_marker.pose.orientation.w = math.sqrt(2) / 2
+        goal_marker.pose.position = self.goal.position
+        goal_marker.pose.position.z = 0.5
+        goal_marker.scale.x = 0.5
+        goal_marker.scale.y = 0.1
+        goal_marker.scale.z = 0.1
+
+        goal_marker.header.frame_id = 'map'
+
+
+        self.goal_marker_pub.publish(goal_marker)
+
 
         rospy.spin()
                 
@@ -101,7 +118,24 @@ class Bug:
         self.goal.position.x = goal_x
         self.goal.position.y = goal_y
 
+        # Compute m line
+
         # Publish marker for rviz
+        goal_marker = Marker()
+        goal_marker.type = Marker.ARROW
+        goal_marker.action = Marker.ADD
+        goal_marker.pose.orientation.y = math.sqrt(2) / 2
+        goal_marker.pose.orientation.w = math.sqrt(2) / 2
+        goal_marker.pose.position = self.goal.position
+        goal_marker.pose.position.z = 0.5
+        goal_marker.scale.x = 0.5
+        goal_marker.scale.y = 0.1
+        goal_marker.scale.z = 0.1
+
+        goal_marker.header.frame_id = 'map'
+
+
+        self.goal_marker_pub.publish(goal_marker)
 
         # Change state to turn
         self.current_state = self.states.TURN
@@ -182,4 +216,4 @@ class Bug:
 
 
 if __name__ == "__main__":
-    bug = Bug1()
+    bug = Bug()

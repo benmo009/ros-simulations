@@ -164,6 +164,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/random_walk.py
   scripts/diff_drive_control.py
+  src/ProximitySensor.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import rospy
-from nav_msgs.msg import OccupancyGrid, Odometry
+from nav_msgs.msg import OccupancyGrid, Odometry, Path
+from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool
 import matplotlib.pyplot as plt
 from matplotlib import transforms
@@ -11,15 +12,13 @@ from matplotlib.patches import Circle
 from Tree import Tree
 import math
 
+
 class RapidlyExploringRandomTree:
     def __init__(self):
         rospy.init_node("rrt_node")
         rospy.Subscriber("/costmap", OccupancyGrid, self.map_callback)
         rospy.wait_for_message("/costmap", OccupancyGrid)
         
-        self.tree_init = [self.map_origin]
-        self.tree_goal = []
-
 
     def map_callback(self, data):
         print(data.info)
@@ -29,6 +28,7 @@ class RapidlyExploringRandomTree:
         self.map_origin = np.array([self.map_origin.x, self.map_origin.y])
 
         self.map_origin = (-self.map_origin / self.map_resolution) - 1975
+        self.map_origin = np.round(self.map_origin).astype(int)
         
 
         self.costmap = data.data
@@ -45,13 +45,7 @@ class RapidlyExploringRandomTree:
         self.goal = np.array([x, y])
         self.goal_on_map = self.goal / self.map_resolution 
         self.goal_on_map += self.map_origin
-
-        
-        # im = plt.imshow(self.costmap)        
-        # plt.scatter(self.map_origin[0], self.map_origin[1], c='green')
-        # plt.scatter(self.goal_on_map[0], self.goal_on_map[1], c='red')
-        # #plt.scatter(self.freespace[:,0], self.freespace[:,1])
-        # plt.show()
+        self.goal_on_map = np.round(self.goal_on_map).astype(int)
 
 
     def draw_tree(self, T_init, T_goal):
@@ -69,12 +63,22 @@ class RapidlyExploringRandomTree:
         
         plt.show()
     
+    def draw_path(self, path):
+        costmap_with_tree = np.copy(self.costmap)    
+
+        path = np.array(path)
+        costmap_with_tree[path[:,0], path[:,1]] = 50
+        
+        im = plt.imshow(costmap_with_tree)
+
+        plt.scatter(self.map_origin[0], self.map_origin[1], c='orange')
+        plt.scatter(self.goal_on_map[0], self.goal_on_map[1], c='orange')
+        
+        plt.show()
 
     def build_rrt(self, n, q0):
-        
         T = Tree()
-        T.V = [q0]
-        T.E = []
+        T.V = [tuple(q0)]
         
         for i in range(n):
             q_rand = np.random.randint(0, self.freespace.shape[0])
@@ -82,18 +86,17 @@ class RapidlyExploringRandomTree:
             self.extend_rrt(T, q_rand)
 
         return T
-        # Find the closer point
+        
     
     def extend_rrt(self, T, q):
         q_near = self.closest_neighbor(T, q)
         q_new = self.find_q_new(q_near, q)
-
         
         # print(self.costmap[q_new[0], q_new[1]])
 
-        if self.costmap[q_new[0], q_new[1]] == 0:
+        if self.costmap[ tuple(q_new) ] == 0:
             T.V.append(q_new)
-            T.E.append((q_near, q_new))
+            T.E.append( (tuple(q_near), tuple(q_new)) )
             return q_new
         
         return np.array([None, None])
@@ -111,20 +114,34 @@ class RapidlyExploringRandomTree:
                 q_new2 = self.extend_rrt(T2, q_new1)
 
                 if (q_new1 == q_new2).all():
-                    return True
+                    return True, q_new1
                 
                 T_temp = T1
                 T1 = T2
                 T2 = T_temp
 
-        return False
+        return False, np.array([None, None])
+
+
+    def tree_path_search(self, T, q_start, q_end):
+        edge = T.E[-1]
+        next_point = edge[0]
+        points = [q_start, next_point]
+        for i in range(-2, -1*len(T.E), -1):
+            edge = T.E[i]
+            if edge[1] == next_point:
+                next_point = edge[0]
+                points.append(next_point)
+
+        return points
 
 
     def closest_neighbor(self, T, q):
         q_near = np.zeros_like(q)
         closest_dist = np.inf
         for point in T.V:
-            distance = np.linalg.norm(point - q)
+            point = np.array(point)
+            distance = np.linalg.norm( point - q )
             if distance <= closest_dist:
                 closest_dist = distance
                 q_near = point
@@ -148,27 +165,41 @@ class RapidlyExploringRandomTree:
 if __name__ == "__main__":    
 
     rrt = RapidlyExploringRandomTree()
-    #rospy.spin_once()
     rrt.set_goal(6,6)
     T_init = rrt.build_rrt(300, rrt.map_origin)
     T_goal = rrt.build_rrt(300, rrt.goal_on_map)
 
     rrt.draw_tree(T_init, T_goal)
 
-    success = rrt.merge_rrt(T_init, T_goal, 300)
+    success, q_common = rrt.merge_rrt(T_init, T_goal, 300)
 
     if success:
-        print("Trees Merged")
+        print("Trees Merged at point", tuple(q_common))
 
-    #im = plt.imshow(rrt.costmap)
-    #plt.scatter(rrt.map_origin[0], rrt.map_origin[1])
-    #plt.scatter(rrt.goal_on_map[0], rrt.goal_on_map[1])
-    # tree_points = np.array(T_init.V)
-    # plt.scatter(rrt.freespace[:,0], rrt.freespace[:,1])
-    # plt.scatter(tree_points[:,0], tree_points[:,1], s=5)
-
-    # plt.show()
     rrt.draw_tree(T_init, T_goal)
 
-    rospy.spin()
+    start_points = rrt.tree_path_search(T_init, q_common, tuple(rrt.map_origin))
+    goal_points = rrt.tree_path_search(T_goal, q_common, tuple(rrt.goal_on_map))
+    start_points = np.flip(start_points, axis=0)
+    path = np.concatenate((start_points, goal_points[1::]), axis=0)
+
+    rrt.draw_path(path)
+
+    # Publish path for rviz
+    path_msg = Path()
+    path_msg.header.frame_id = 'map'
+    for point in path:
+        pose_obj = PoseStamped()
+        pose_obj.pose.position.y = (point[0] - 25) * rrt.map_resolution
+        pose_obj.pose.position.x = (point[1] - 25)* rrt.map_resolution
+        pose_obj.pose.orientation.w = 1
+        path_msg.poses.append(pose_obj)
+
+    pub = rospy.Publisher("robot_path", Path, queue_size=0)
+    rate = rospy.Rate(10)
+    while not rospy.is_shutdown():
+        pub.publish(path_msg)
+        rate.sleep()
+
+
     

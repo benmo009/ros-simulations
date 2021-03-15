@@ -1,9 +1,16 @@
 <launch>
 
+    <include file="$(find mobile_bot)/launch/mobile_bot_teleop.launch">
+        <arg name="rvizconfig" value="$(find mobile_bot_navigation)/rviz/mobile_bot_rrt.rviz" />
+        <arg name="gazebo_gui" value="false" />
+    </include>
+
     <node name="map_server" pkg="map_server" type="map_server" 
     args="$(find mobile_bot_navigation)/maps/costmap/costmap.yaml">
         <remap from="/map" to="/costmap"/>
     </node>
 
+    <!-- run robot localization -->
+    <include file="$(find mobile_bot_ekf)/launch/mobile_bot_robot_localization_ekf.launch"/>
     
 </launch>

@@ -172,10 +172,18 @@ class Bug:
         tol = 0.01
         angle_to_goal = math.atan2(goal.y - current.y, goal.x - current.x)
         count = 0  # Add a small count so the loop doesn't break too early
+
+        if self.right_at_obstacle:
+            range_sensor = self.left_range
+            factor = 1
+        else:
+            range_sensor = self.right_range
+            factor = -1
+
         while abs(current_angle - angle_to_goal) > tol or count < 3:
-            if self.left_range > 0.6:
+            if range_sensor > 0.6:
                 vel_msg = Twist()
-                vel_msg.angular.z = 0.1
+                vel_msg.angular.z = factor * 0.1
                 self.vel_pub.publish(vel_msg)
             else:
                 vel_msg = Twist()
@@ -186,14 +194,10 @@ class Bug:
             q = self.current_pose.orientation
             current_angle = euler_from_quaternion([q.x, q.y, q.z, q.w])
             current_angle = current_angle[2]
-
-            current = self.current_pose.position
-
+            current = self.current_pose.
+            
             # Measure angle to goal
             current_angle = math.atan2(angle_to_goal = math.atan2(goal.y - current.y, goal.x - current.x))
-
-            print( abs(current_angle - angle_to_goal) )
-            
             count += 1
 
         self.current_state = self.states.DRIVE

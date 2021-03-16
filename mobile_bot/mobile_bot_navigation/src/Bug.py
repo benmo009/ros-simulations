@@ -10,7 +10,6 @@ import numpy as np
 from enum import Enum
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 import matplotlib.pyplot as plt
-from visualization_msgs.msg import Marker
 
 class Bug:
     def __init__(self):
@@ -21,7 +20,6 @@ class Bug:
         self.odom_sub = rospy.Subscriber("/odometry/filtered", Odometry, self.odom_callback)
         self.prox_sub = rospy.Subscriber("/mobile_bot/proximity_sensor", LaserScan, self.prox_callback)
         self.vel_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=0)
-        self.goal_marker_pub = rospy.Publisher("/goal_marker", Marker, queue_size=0)
         rospy.wait_for_message("/odometry/filtered", Odometry)
 
 
@@ -32,6 +30,8 @@ class Bug:
         self.near_object = False
         self.object_detected = False
         self.goal_reached = False
+
+        self.right_at_obstacle = True
    
         # Run the main loop
         self.main_loop()
@@ -62,31 +62,9 @@ class Bug:
 
             elif self.current_state == self.states.FOLLOW_OBSTACLE:
                 print("Follow Obstacle")
-                while self.left_range >= 0.6:
-                    vel_msg = Twist()
-                    vel_msg.angular.z = -0.1
-                    self.vel_pub.publish(vel_msg)
+                self.turn_for_obstacle()
                 self.stop()
                 self.follow_obstacle()
-
-
-        # Publish marker for rviz
-        goal_marker = Marker()
-        goal_marker.type = Marker.ARROW
-        goal_marker.action = Marker.ADD
-        goal_marker.pose.orientation.y = math.sqrt(2) / 2
-        goal_marker.pose.orientation.w = math.sqrt(2) / 2
-        goal_marker.pose.position = self.goal.position
-        goal_marker.pose.position.z = 0.5
-        goal_marker.scale.x = 0.5
-        goal_marker.scale.y = 0.1
-        goal_marker.scale.z = 0.1
-
-        goal_marker.header.frame_id = 'map'
-
-
-        self.goal_marker_pub.publish(goal_marker)
-
 
         rospy.spin()
                 
@@ -98,6 +76,7 @@ class Bug:
 
     def prox_callback(self, data):
         self.left_range = data.ranges[1]
+        self.right_range = data.ranges[3]
 
     def map_callback(self, data):
         self.near_object = data.data
@@ -117,25 +96,6 @@ class Bug:
         self.goal = Pose()
         self.goal.position.x = goal_x
         self.goal.position.y = goal_y
-
-        # Compute m line
-
-        # Publish marker for rviz
-        goal_marker = Marker()
-        goal_marker.type = Marker.ARROW
-        goal_marker.action = Marker.ADD
-        goal_marker.pose.orientation.y = math.sqrt(2) / 2
-        goal_marker.pose.orientation.w = math.sqrt(2) / 2
-        goal_marker.pose.position = self.goal.position
-        goal_marker.pose.position.z = 0.5
-        goal_marker.scale.x = 0.5
-        goal_marker.scale.y = 0.1
-        goal_marker.scale.z = 0.1
-
-        goal_marker.header.frame_id = 'map'
-
-
-        self.goal_marker_pub.publish(goal_marker)
 
         # Change state to turn
         self.current_state = self.states.TURN
@@ -179,18 +139,40 @@ class Bug:
         vel_msg.linear.x = 0.1
         self.vel_pub.publish(vel_msg)
 
+    
+    # Turns right or left until parallel to obstacle
+    def turn_for_obstacle(self):
+        # Turn right 
+        if self.right_at_obstacle:
+            while self.left_range >= 0.6:
+                    vel_msg = Twist()
+                    vel_msg.angular.z = -0.1
+                    self.vel_pub.publish(vel_msg)
 
+        # Turn left
+        else:
+            while self.right_range >= 0.6:
+                    vel_msg = Twist()
+                    vel_msg.angular.z = 0.1
+                    self.vel_pub.publish(vel_msg)
+
+
+    # Follows the obstacle
     def follow_obstacle(self):
-        starting_point = self.current_pose
-        starting_point = np.array([starting_point.position.x, starting_point.position.y])
-        g = np.array([self.goal.position.x, self.goal.position.y])
+        # Get current angle
+        q = self.current_pose.orientation
+        current_angle = euler_from_quaternion([q.x, q.y, q.z, q.w])
+        current_angle = current_angle[2]
 
-        distance_from_start = 100
-        min_dist = np.linalg.norm(starting_point - g)
-        min_point = starting_point
-        
-
-        while distance_from_start > 0.1:
+        # Get current robot pose
+        current = self.current_pose.position
+        goal = self.goal.position
+ 
+        # Follow obstacle until the angle to the goal matches the starting angle
+        tol = 0.01
+        angle_to_goal = math.atan2(goal.y - current.y, goal.x - current.x)
+        count = 0  # Add a small count so the loop doesn't break too early
+        while abs(current_angle - angle_to_goal) > tol or count < 3:
             if self.left_range > 0.6:
                 vel_msg = Twist()
                 vel_msg.angular.z = 0.1
@@ -200,19 +182,24 @@ class Bug:
                 vel_msg.linear.x = 0.1
                 self.vel_pub.publish(vel_msg)
 
-            # Get current_point
-            current_point = self.current_pose
-            current_point = np.array([self.current_pose.position.x, self.current_pose.position.y])
+            # Get current angle
+            q = self.current_pose.orientation
+            current_angle = euler_from_quaternion([q.x, q.y, q.z, q.w])
+            current_angle = current_angle[2]
 
-            distance_from_start = np.linalg.norm(current_point - starting_point)
-            distance_from_goal = np.linalg.norm(current_point - g)
-            if min_dist >= distance_from_goal:
-                min_dist = distance_from_goal
-                min_point = current_point
+            current = self.current_pose.position
+
+            # Measure angle to goal
+            current_angle = math.atan2(angle_to_goal = math.atan2(goal.y - current.y, goal.x - current.x))
+
+            print( abs(current_angle - angle_to_goal) )
             
-        
-        # Go back
+            count += 1
 
+        self.current_state = self.states.DRIVE
+
+        # Turn at the opposite direction next time
+        self.right_at_obstacle = not self.right_at_obstacle
 
 
 if __name__ == "__main__":

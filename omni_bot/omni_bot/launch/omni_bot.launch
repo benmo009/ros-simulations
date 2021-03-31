@@ -1,0 +1,25 @@
+<launch>
+    <!-- Arguments -->
+    <arg name="robot" default="$(find omni_bot_description)/urdf/omni_bot.xacro" />
+    <arg name="gui" default="true" />
+    <arg name="num_robots" default="3" />
+
+    <!-- Start Gazebo -->
+    <!-- Load the empty world from gazebo_ros package -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <!-- <arg name="world_name" value="$(find mobile_bot_gazebo)/world/top_down_cam.world"/> -->
+        <arg name="gui" value="$(arg gui)"/>
+    </include>
+
+    <!-- Load robot description xacro to the parameter server -->
+    <param name="robot_description" command="$(find xacro)/xacro $(arg robot)" />
+
+    <!-- Spawn the robot into Gazebo -->
+    <node name="robot_spawner" pkg="omni_bot" type="OmniBotSpawner.py" args="$(arg num_robots)" output="screen" />
+
+    <node name="formation_control" pkg="omni_bot" type="FormationControl.py" output="screen" />
+
+    <!-- <node name="keyboard_teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
+        output="screen" /> --> 
+    
+</launch>

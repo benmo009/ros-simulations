@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="omni_bot">
+
+    <!-- Xacro properties -->
+
+    <!-- Body dimensions -->
+    <xacro:property name="body_rad" value="0.2"/>
+    <xacro:property name="body_diam" value="${2.0*body_rad}"/>
+    <xacro:property name="body_height" value="0.15"/>
+    <xacro:property name="clearance" value="0.05"/>
+
+    <xacro:property name="half_body_height" value="${body_height/2.0}"/>
+    <xacro:property name="bodyOz" value="${half_body_height + clearance}"/>
+
+    <!-- Wheel dimensions -->
+    <xacro:property name="wheel_rad" value="0.075"/>
+    <xacro:property name="wheel_diam" value="${2.0*wheel_rad}"/>
+    <xacro:property name="wheel_width" value="0.025"/>
+    <xacro:property name="wheelOz" value="${-bodyOz/2}"/>
+
+    <xacro:property name="robot_footprint" value="${body_rad+wheel_width}"/>
+
+    <xacro:property name="M_PI" value="3.14159265359"/>
+    <xacro:property name="COS_30" value="0.8660254037844387"/>
+    <xacro:property name="SIN_30" value="0.5"/>
+
+    <footprint value="${robot_footprint}" />
+
+    <!-- Material Definitions -->
+    <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+    </material>
+
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+    
+    <material name="white">
+        <color rgba="1 1 1 1"/>
+    </material>
+
+    <!-- Default Inertial macro -->
+    <xacro:macro name="default_inertial" params="mass">
+        <inertial>
+            <mass value="${mass}"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                     iyy="1.0" iyz="0.0"
+                     izz="1.0"/>
+        </inertial>
+    </xacro:macro>
+
+    <!-- Robot base link -->
+    <link name="base_link"/>
+
+    <!-- Robot Body Link -->
+    <link name="body_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${body_rad}" length="${body_height}"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${body_rad}" length="${body_height}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="50.0"/>
+            <origin xyz="0 0 ${-bodyOz}" />
+            <inertia ixx="50.0" ixy="0.0" ixz="0.0"
+                     iyy="50.0" iyz="0.0"
+                     izz="50.0"/>
+        </inertial>
+    </link>
+
+    <joint name="body_joint" type="fixed">
+        <origin xyz="0.0 0 ${bodyOz}" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="body_link"/>
+    </joint>
+
+    <!-- Wheel macro -->
+    <xacro:macro name="wheel" params="*origin number">
+        <link name="wheel_${number}_link">
+            <visual>
+                <geometry>
+                    <cylinder radius="${wheel_rad}" length="${wheel_width}"/>
+                </geometry>
+                <material name="white"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder radius="${wheel_rad}" length="${wheel_width}"/>
+                </geometry>           
+            </collision>
+            <xacro:default_inertial mass="1"/>
+        </link>
+
+        <joint name="wheel_${number}_joint" type="continuous">
+            <axis xyz="0 0 1"/>
+            <parent link="body_link"/>
+            <child link="wheel_${number}_link"/>
+            <xacro:insert_block name="origin" />
+            <limit effort="100" velocity="15"/>
+            <joint_properties damping="0.0" friction="0.0"/>
+        </joint>
+
+        <gazebo reference="wheel_${number}_link">
+            <mu1 value="0.0"/>
+            <mu2 value="0.0"/>
+            <!-- <kp value="10000000.0"/>
+            <kd value="1.0"/> -->
+            <material>Gazebo/Grey</material>
+        </gazebo>
+
+        <transmission name="wheel_${number}_trans">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="wheel_${number}_motor">
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="wheel_${number}_joint">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+    </xacro:macro>
+
+    <!-- Wheels -->
+    <xacro:wheel number="1">
+        <origin 
+            xyz="${body_rad} 0 ${wheelOz}" 
+            rpy="0 ${M_PI/2} 0"/>
+    </xacro:wheel>
+
+    <xacro:wheel number="2">
+        <origin 
+            xyz="${-SIN_30*body_rad} ${COS_30*body_rad} ${wheelOz}" 
+            rpy="0 ${M_PI/2} ${2*M_PI/3}"/>
+    </xacro:wheel>
+
+    <xacro:wheel number="3">
+        <origin 
+            xyz="${-SIN_30*body_rad} ${-COS_30*body_rad} ${wheelOz}" 
+            rpy="0 ${M_PI/2} ${-2*M_PI/3}"/>
+    </xacro:wheel>
+
+    <!-- Gazebo Plugin for Control -->
+	<gazebo>
+	    <plugin name="omni_steering" filename="libgazebo_ros_planar_move.so">
+            <commandTopic>cmd_vel</commandTopic>
+            <odometryTopic>odom</odometryTopic>
+            <odometryFrame>odom</odometryFrame>
+            <odometryRate>50.0</odometryRate>
+            <robotBaseFrame>base_link</robotBaseFrame>
+            <publishTF>true</publishTF>
+	    </plugin>
+	</gazebo>
+
+</robot>

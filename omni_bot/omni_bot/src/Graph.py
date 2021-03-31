@@ -198,7 +198,7 @@ if __name__ == "__main__":
         zk = np.kron( np.transpose(D), np.eye(n,n) ) @ q[:,k]
 
         psi = zk - z_des
-        qrange = 0.5 # to avoid collision  2.5  5  0.5
+        qrange = 0.8 # to avoid collision  2.5  5  0.5
 
         # Collision Avoidance
         zkfull = np.kron( np.transpose(D_full), np.eye(n,n) ) @ q[:,k]
@@ -264,6 +264,7 @@ if __name__ == "__main__":
                     [np.sin(th), np.cos(th)] ])
 
     q0 = np.reshape(q[:,-1], (N,n))
+    q_old = np.copy(q)
     q[:,0] = q[:,-1]
         
     # Time
@@ -290,7 +291,7 @@ if __name__ == "__main__":
         phiflat = zkflat * psifun(distzk, qrange) / distzk
         phi = np.reshape(phiflat, n*links_full,)
 
-        u[:,k] = -Kp @ np.kron( D, np.eye(n) ) @ psi + Kp1 @ np.kron(D_full, np.eye(n)) @ phi
+        u[:,k] = -Kp @ np.kron( D, np.eye(n) ) @ psi + Kp1 @ np.kron(D_full, np.eye(n)) @ phi + 2*ts
         
         q[:,k+1] = q[:,k] + ts * u[:,k]
 
@@ -298,6 +299,8 @@ if __name__ == "__main__":
     zf = np.kron( np.transpose(D), np.eye(n) ) @ q[:,-1]
     print("Final Relative Error")
     print(np.reshape(zf - z_des, (links, n)))
+
+    q = np.concatenate((q_old, q), axis=1)
 
     fig, ax = plt.subplots()
     origins = np.reshape(q[:,0], (N,2))
@@ -333,6 +336,7 @@ if __name__ == "__main__":
     ylim = ax.get_ylim()
 
     plt.show()
+
     
     animator = Animator(q, 0.2, xlim, ylim)
     animator.AnimatePoints()

@@ -7,7 +7,7 @@ import networkx as nx
 from networkx.linalg.graphmatrix import incidence_matrix
 
 class FormationControl:
-    def __init__(self, form_rad, rate=20, Kp=0.3, Kp1=0.2, qrange=0.8):
+    def __init__(self, form_rad, rate=10, Kp=0.3, Kp1=0.2, qrange=0.8):
         self.form_rad = form_rad
 
         # Initialize ros node
@@ -33,6 +33,9 @@ class FormationControl:
 
         rospy.loginfo("Formation Control - Got origins! There are %d robots" % self.N)
 
+        self.linear_vel = Twist()
+        self.angular_vel = 0
+
         # Set up publisher to each /omni_bot_#/cmd_vel topic
         self.omni_pubs = []
         for n in range(self.N):
@@ -48,6 +51,19 @@ class FormationControl:
         rospy.loginfo("Formation Control - In Formation!")
 
         # Start taking keyboard prompts - set up /cmd_vel subscriber
+        self.vel_sub = rospy.Subscriber("/cmd_vel", Twist, self.vel_callback)
+
+        self.main()
+
+
+    def vel_callback(self, data):
+        self.linear_vel = data
+        self.angular_vel = 0
+
+        if data.angular.z > 0:
+            self.angular_vel = 2
+        elif data.angular.z < 0:
+            self.angular_vel = -2
 
 
     def PublishToOmnibots(self, vel):
@@ -145,7 +161,35 @@ class FormationControl:
         z_final = self.K @ self.q 
         rospy.loginfo("Final Relative Error")
         rospy.loginfo(z_final)
-        
+
+
+    def main(self):
+        while not rospy.is_shutdown():
+            vel = np.zeros((self.N, self.num_states))
+            vel[:,0] = self.linear_vel.linear.x
+            vel[:,1] = self.linear_vel.linear.y
+            vel.shape = (self.flat_dim, )
+
+            th = self.angular_vel * self.dt
+            R = np.array([ [np.cos(th), -np.sin(th)],
+                            [np.sin(th), np.cos(th)] ])
+            
+            q_des = np.reshape(self.q, (self.N, self.num_states)) @ np.transpose(R)
+            q_des.shape = (self.flat_dim, )
+            z_des = self.K @ q_des
+
+            psi = self.PositionPotential(z_des)
+            phi = self.CollisionPotential()
+
+            u = -self.Kp @ np.kron( self.D, np.eye(self.num_states) ) @ psi 
+            u += self.Kp1 @ np.kron(self.D_full, np.eye(self.num_states)) @ phi
+            u += vel
+
+            self.q = self.q + self.dt * u
+
+            self.PublishToOmnibots( np.reshape(u, (self.N, self.num_states)) )
+
+            self.rate.sleep()
 
 
     def stop(self):

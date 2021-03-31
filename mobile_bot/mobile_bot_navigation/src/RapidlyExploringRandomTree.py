@@ -86,13 +86,10 @@ class RapidlyExploringRandomTree:
             self.extend_rrt(T, q_rand)
 
         return T
-        
     
     def extend_rrt(self, T, q):
         q_near = self.closest_neighbor(T, q)
         q_new = self.find_q_new(q_near, q)
-        
-        # print(self.costmap[q_new[0], q_new[1]])
 
         if self.costmap[ tuple(q_new) ] == 0:
             T.V.append(q_new)
@@ -100,6 +97,7 @@ class RapidlyExploringRandomTree:
             return q_new
         
         return np.array([None, None])
+
 
     def merge_rrt(self, T_init, T_goal, n):
         T1 = T_init
@@ -147,7 +145,6 @@ class RapidlyExploringRandomTree:
                 q_near = point
 
         return q_near
-
 
     def find_q_new(self, q_near, q_rand):
         q_new = np.zeros_like(q_rand)

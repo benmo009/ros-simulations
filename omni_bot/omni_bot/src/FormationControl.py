@@ -5,13 +5,16 @@ from geometry_msgs.msg import Twist, Pose
 import numpy as np
 import networkx as nx
 from networkx.linalg.graphmatrix import incidence_matrix
+from gazebo_msgs.srv import GetModelState
 
 class FormationControl:
-    def __init__(self, form_rad, rate=10, Kp=0.3, Kp1=0.2, qrange=0.8):
+    def __init__(self, form_rad, rate=10, Kp=0.6, Kp1=-0.25, qrange=1.0):
         self.form_rad = form_rad
 
         # Initialize ros node
         rospy.init_node("formation_control")
+        rospy.wait_for_service("gazebo/get_model_state")
+        self.model_state = rospy.ServiceProxy("gazebo/get_model_state", GetModelState)
 
         self.rate = rospy.Rate(rate)
         self.dt = 1/rate
@@ -46,7 +49,7 @@ class FormationControl:
         self.InitGraphs()
 
         # Move to formation
-        self.MoveToFormation(200)
+        self.MoveToFormation(150)
 
         rospy.loginfo("Formation Control - In Formation!")
 
@@ -132,6 +135,19 @@ class FormationControl:
 
         return phi
 
+
+    def GetRobotPositions(self):
+        positions = np.zeros((self.N, self.num_states))
+
+        for i in range(self.N):
+            robot_name = ( "omni_bot_%d" % i )
+            state = self.model_state(robot_name, 'world')
+            p = state.pose.position
+            positions[i] = [p.x, p.y]
+        
+        self.q = np.reshape(positions, (self.flat_dim, ))
+
+
     def MoveToFormation(self, T):
         # Compute desired positions
         theta_res = 2*np.pi / self.N
@@ -146,13 +162,12 @@ class FormationControl:
         z_des  = np.kron( np.transpose(self.D), np.eye(self.num_states) ) @ q_des
 
         for t in range(T):
+            self.GetRobotPositions()
             psi = self.PositionPotential(z_des)
             phi = self.CollisionPotential()
 
             u = -self.Kp @ np.kron( self.D, np.eye(self.num_states) ) @ psi 
-            u += self.Kp1 @ np.kron(self.D_full, np.eye(self.num_states)) @ phi
-
-            self.q = self.q + self.dt*u
+            u += -self.Kp1 @ np.kron(self.D_full, np.eye(self.num_states)) @ phi
 
             self.PublishToOmnibots( np.reshape(u, (self.N, self.num_states)) )
             
@@ -173,6 +188,8 @@ class FormationControl:
             th = self.angular_vel * self.dt
             R = np.array([ [np.cos(th), -np.sin(th)],
                             [np.sin(th), np.cos(th)] ])
+
+            self.GetRobotPositions()
             
             q_des = np.reshape(self.q, (self.N, self.num_states)) @ np.transpose(R)
             q_des.shape = (self.flat_dim, )
@@ -182,10 +199,8 @@ class FormationControl:
             phi = self.CollisionPotential()
 
             u = -self.Kp @ np.kron( self.D, np.eye(self.num_states) ) @ psi 
-            u += self.Kp1 @ np.kron(self.D_full, np.eye(self.num_states)) @ phi
+            u += -self.Kp1 @ np.kron(self.D_full, np.eye(self.num_states)) @ phi
             u += vel
-
-            self.q = self.q + self.dt * u
 
             self.PublishToOmnibots( np.reshape(u, (self.N, self.num_states)) )
 

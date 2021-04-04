@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="doorway">
+
+    <xacro:property name="wall_length" value="10.0" />
+    <xacro:property name="wall_width" value="0.25" />
+    <xacro:property name="wall_height" value="4" />
+
+    <xacro:property name="half_wall_length" value="${wall_length/2.0}" />
+    <xacro:property name="half_wall_width" value="${wall_width/2.0}" />
+    <xacro:property name="half_wall_height" value="${wall_height/2.0}" />
+
+    <xacro:property name="M_PI" value="3.14159265359"/>
+
+    <!-- Default Inertial macro -->
+    <xacro:macro name="default_inertial" params="mass">
+        <inertial>
+            <mass value="${mass}"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                     iyy="1.0" iyz="0.0"
+                     izz="1.0"/>
+        </inertial>
+    </xacro:macro>
+
+    <!-- World Link -->
+    <link name="world"/>
+
+    <link name="base_link"/>
+
+    <joint name="world_to_base_joint" type="fixed">
+        <parent link="world" />
+        <child link="base_link" />
+    </joint>
+
+    <!-- Wall macro -->
+    <xacro:macro name="wall" params="*origin number">
+        <link name="wall_${number}_link">
+            <visual>
+                <geometry>
+                    <box size="${wall_length} ${wall_width} ${wall_height}" />
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <box size="${wall_length} ${wall_width} ${wall_height}" />
+                </geometry>
+            </collision>
+            <xacro:default_inertial mass="50" />
+        </link>
+
+        <joint name="wall_${number}_joint" type="fixed">
+            <parent link="base_link" />
+            <child link="wall_${number}_link" />
+            <xacro:insert_block name="origin" />
+        </joint>
+
+        <gazebo reference="wall_${number}_link">
+            <material>Gazebo/Orange</material>
+        </gazebo>
+    </xacro:macro>
+
+    <!-- Place walls -->
+    <xacro:wall number="1">
+        <origin xyz="${half_wall_length+0.5} ${-half_wall_width} ${half_wall_height}" rpy="0 0 0" />
+    </xacro:wall>
+
+    <xacro:wall number="2">
+        <origin xyz="${-half_wall_length - 0.5} ${-half_wall_width} ${half_wall_height}" rpy="0 0 0" />
+    </xacro:wall>
+
+
+
+</robot>

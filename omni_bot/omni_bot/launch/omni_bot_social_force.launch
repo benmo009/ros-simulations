@@ -1,0 +1,19 @@
+<launch>
+    <arg name="num_robots" default="3" />
+    <arg name="spawn_x" default="0.0" />
+    <arg name="spawn_y" default="0.0" />
+
+    <include file="$(find omni_bot)/launch/omni_bot.launch">
+        <arg name="num_robots" value="$(arg num_robots)" />
+        <arg name="spawn_x" value="$(arg spawn_x)" />
+        <arg name="spawn_y" value="$(arg spawn_y)" />
+    </include>
+
+
+    <include file="$(find social_force)/launch/doorway.launch" />
+
+    <node name="load_doorway_params" pkg="social_force" type="load_doorway_params.py" />
+
+    <node name="social_force" pkg="social_force" type="SocialForce.py" output="screen"/>
+
+</launch>

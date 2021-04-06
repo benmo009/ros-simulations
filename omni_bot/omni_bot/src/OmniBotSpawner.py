@@ -4,7 +4,7 @@ import rospy
 from gazebo_msgs.srv import SpawnModel
 from geometry_msgs.msg import Pose
 import numpy as np
-from numpy.random import normal
+from numpy.random import multivariate_normal
 
 import argparse as ap
 
@@ -12,10 +12,11 @@ import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 
 class OmniBotSpawner:
-    def __init__(self, N):
+    def __init__(self, args):
         # Number of robots to spawn
-        self.N = N
-        self.variance = N / 2
+        self.N = args.N
+        self.mean = np.array([args.x, args.y])
+        self.variance = np.eye(2)
 
         # Initialize ROS Node and spawn_urdf client
         rospy.init_node("robot_spawner")
@@ -31,7 +32,7 @@ class OmniBotSpawner:
         self.get_body_radius()  # Get the radius of the robot
 
         # Generate the origins for each robot 
-        self.generate_origins(1)
+        self.generate_origins(self.variance)
 
         # Spawn the robots
         self.spawn_robots()
@@ -91,7 +92,7 @@ class OmniBotSpawner:
 
     # Generates random origins for each robot
     def generate_origins(self, variance):
-        self.origins = normal(0, variance, (self.N, 2))
+        self.origins = multivariate_normal(self.mean, variance, self.N)
         self.plot_points()
 
         # Check for overlap
@@ -127,6 +128,9 @@ if __name__ == "__main__":
     # Argument parser to get number of robots to spawn
     parser = ap.ArgumentParser(description="Spawn multiple omni-bots at random positions")
     parser.add_argument("N", type=int, help="Number of omni-bots to spawn")
+    parser.add_argument("x", type=float, default=0.0, help="Mean x value for origin")
+    parser.add_argument("y", type=float, default=0.0, help="Mean y value for origin")
+
     args, unknown = parser.parse_known_args()
 
-    spawner = OmniBotSpawner(args.N)
+    spawner = OmniBotSpawner(args)

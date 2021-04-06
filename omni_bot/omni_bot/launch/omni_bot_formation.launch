@@ -1,0 +1,16 @@
+<launch>
+    <arg name="num_robots" default="3" />
+    <arg name="spawn_x" default="0.0" />
+    <arg name="spawn_y" default="0.0" />
+
+    <include file="$(find omni_bot)/launch/omni_bot.launch">
+        <arg name="num_robots" value="$(arg num_robots)" />
+        <arg name="spawn_x" value="$(arg spawn_x)" />
+        <arg name="spawn_y" value="$(arg spawn_y)" />
+    </include>
+
+    <node name="formation_control" pkg="omni_bot" type="FormationControl.py" output="screen" />
+
+    <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" />
+
+</launch>

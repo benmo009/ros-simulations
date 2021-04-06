@@ -213,4 +213,4 @@ class FormationControl:
             self.omni_pubs[n].publish(twist_msg)
 
 if __name__ == "__main__":
-    fc = FormationControl(2)
+    fc = FormationControl(2, Kp=0.6, Kp1=-0.5, qrange=0.8)

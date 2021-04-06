@@ -3,6 +3,8 @@
     <arg name="robot" default="$(find omni_bot_description)/urdf/omni_bot.xacro" />
     <arg name="gui" default="true" />
     <arg name="num_robots" default="3" />
+    <arg name="spawn_x" default="0.0" />
+    <arg name="spawn_y" default="0.0" />
 
     <!-- Start Gazebo -->
     <!-- Load the empty world from gazebo_ros package -->
@@ -15,9 +17,8 @@
     <param name="robot_description" command="$(find xacro)/xacro $(arg robot)" />
 
     <!-- Spawn the robot into Gazebo -->
-    <node name="robot_spawner" pkg="omni_bot" type="OmniBotSpawner.py" args="$(arg num_robots)" output="screen" />
+    <node name="robot_spawner" pkg="omni_bot" type="OmniBotSpawner.py" args="$(arg num_robots) $(arg spawn_x) $(arg spawn_y)" output="screen" />
 
-    <node name="formation_control" pkg="omni_bot" type="FormationControl.py" output="screen" />
 
     <!-- <node name="keyboard_teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
         output="screen" /> --> 

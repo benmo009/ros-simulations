@@ -1,0 +1,10 @@
+<launch>
+
+    <arg name="doorway" default="$(find social_force)/urdf/doorway.xacro" />
+    <param name="room_description" command="$(find xacro)/xacro $(arg doorway)" />
+
+    <!-- Spawn room model into Gazebo -->
+    <node name="spawn_room" pkg="gazebo_ros" type="spawn_model" 
+        args="-param room_description -urdf -model doorway" />
+
+</launch>

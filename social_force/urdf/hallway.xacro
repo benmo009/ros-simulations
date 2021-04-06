@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="doorway">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="hallway">
 
     <xacro:property name="wall_length" value="10.0" />
     <xacro:property name="wall_width" value="0.25" />
     <xacro:property name="wall_height" value="4" />
 
-    <xacro:property name="door_width" value="2" />
+    <xacro:property name="hall_width" value="5" />
 
     <xacro:property name="half_wall_length" value="${wall_length/2.0}" />
     <xacro:property name="half_wall_width" value="${wall_width/2.0}" />
@@ -62,11 +62,12 @@
 
     <!-- Place walls -->
     <xacro:wall number="1">
-        <origin xyz="${half_wall_length+(door_width/2)} ${-half_wall_width} ${half_wall_height}" rpy="0 0 0" />
+        <origin xyz="0 ${-hall_width/2} ${half_wall_height}" rpy="0 0 0" />
     </xacro:wall>
 
     <xacro:wall number="2">
-        <origin xyz="${-half_wall_length - (door_width/2)} ${-half_wall_width} ${half_wall_height}" rpy="0 0 0" />
+        <origin xyz="0 ${hall_width/2} ${half_wall_height}" rpy="0 0 0" />
+
     </xacro:wall>
 
 

@@ -1,5 +1,5 @@
 import numpy as np
-from Boundary import Boundary
+from social_force.Boundary import Boundary
 from numpy.linalg import norm
 
 class BoundaryForce:

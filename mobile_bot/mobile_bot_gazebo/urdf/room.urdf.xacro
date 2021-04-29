@@ -21,14 +21,43 @@
         </inertial>
     </xacro:macro>
 
+    <!-- Materials -->
+    <material name='orange'>
+        <color rgba='1 0.65 0 1' />
+    </material>
+
+    <material name='black'>
+        <color rgba='1 1 1 1' />
+    </material>
+
+    <material name='cyan'>
+        <color rgba='0 0.3 1 1' />
+    </material>
+
+    <material name='lime'>
+        <color rgba='0.3 1 0 1' />
+    </material>
+
+    <material name='peach'>
+        <color rgba='1 0.3 0.3 1' />
+    </material>
+
     <!-- World Link -->
     <link name="world"/>
 
+    <link name="map"/>
+
+    <joint name="world_to_map_joint" type="fixed">
+        <parent link="world" />
+        <child link="map" />
+    </joint>
+
     <link name="base_link"/>
 
-    <joint name="world_to_base_joint" type="fixed">
-        <parent link="world" />
+    <joint name="map_to_base_joint" type="fixed">
+        <parent link="map" />
         <child link="base_link" />
+        <origin xyz="-1 -1 0" rpy="0 0 0" />
     </joint>
 
     <!-- Wall macro -->
@@ -38,6 +67,7 @@
                 <geometry>
                     <box size="${wall_length} ${wall_width} ${wall_height}" />
                 </geometry>
+                <material name='orange' />
             </visual>
             <collision>
                 <geometry>
@@ -77,12 +107,13 @@
 
 
     <!-- Block macro -->
-    <xacro:macro name="block" params="number size *origin *material">
+    <xacro:macro name="block" params="number size color *origin *material">
         <link name="block_${number}_link">
             <visual>
                 <geometry>
                     <box size="${size}" />
                 </geometry>
+                <material name="${color}" />
             </visual>
             <collision>
                 <geometry>
@@ -106,45 +137,46 @@
     <!-- Place blocks -->
     <xacro:property name="table_height" value="1.0" />
 
-    <xacro:block number="table_1" size="2 1 ${table_height}">
+    <xacro:block number="table_1" size="2 1 ${table_height}" color="black">
         <origin xyz="5 5 ${table_height/2.0}" rpy="0 0 ${M_PI/2.0}" />
-        <material>Gazebo/Purple</material>
+        <gazebo_material>Gazebo/Purple</gazebo_material>
     </xacro:block>
 
-    <xacro:block number="table_2" size="2 1 ${table_height}">
+    <xacro:block number="table_2" size="2 1 ${table_height}" color="black">
         <origin xyz="2 8 ${table_height/2.0}" rpy="0 0 0" />
         <material>Gazebo/Purple</material>
     </xacro:block>
 
     <xacro:property name="cabinet_height" value="2.0" />
 
-    <xacro:block number="cabinet_1" size="2 1 ${cabinet_height}">
+    <xacro:block number="cabinet_1" size="2 1 ${cabinet_height}" color="peach">
         <origin xyz="9.5 8 ${cabinet_height/2.0}" rpy="0 0 ${M_PI/2.0}" />
         <material>Gazebo/White</material>
     </xacro:block>
 
-    <xacro:block number="cabinet_2" size="2 1 ${cabinet_height}">
+    <xacro:block number="cabinet_2" size="2 1 ${cabinet_height}" color="peach">
         <origin xyz="9.5 1 ${cabinet_height/2.0}" rpy="0 0 ${M_PI/2.0}" />
         <material>Gazebo/White</material>
     </xacro:block>
 
-    <xacro:block number="cabinet_3" size="2 1.5 ${cabinet_height}">
+    <xacro:block number="cabinet_3" size="2 1.5 ${cabinet_height}" color="peach">
         <origin xyz="6 ${1.5/2.0} ${cabinet_height/2.0}" rpy="0 0 0" />
         <material>Gazebo/White</material>
     </xacro:block>
 
-    <xacro:block number="cabinet_4" size="2 1 ${cabinet_height}">
+    <xacro:block number="cabinet_4" size="2 1 ${cabinet_height}" color="peach">
         <origin xyz="4 0.5 ${cabinet_height/2.0}" rpy="0 0 0" />
         <material>Gazebo/White</material>
     </xacro:block>
 
     <!-- Stool Macro -->
-    <xacro:macro name="stool" params="name radius height *origin *material">
+    <xacro:macro name="stool" params="name radius height color *origin *material">
         <link name="stool_${name}_link">
             <visual>
                 <geometry>
                     <cylinder radius="${radius}" length="${height}" />
                 </geometry>
+                <material name="${color}" />
             </visual>
             <collision>
                 <geometry>
@@ -166,7 +198,7 @@
     </xacro:macro>
 
     <!-- Place cylinders -->
-    <xacro:stool name="tall" radius="0.5" height="1.5">
+    <xacro:stool name="tall" radius="0.5" height="1.5" color='lime'>
         <origin xyz="8 5 ${1.5/2.0}" rpy="0 0 0" />
         <material>Gazebo/Green</material>
     </xacro:stool>
@@ -174,17 +206,17 @@
     <xacro:property name="stool_height" value="0.4" />
     <xacro:property name="stool_rad" value="0.25" />
 
-    <xacro:stool name="1" radius="${stool_rad}" height="${stool_height}">
+    <xacro:stool name="1" radius="${stool_rad}" height="${stool_height}" color='cyan'>
         <origin xyz="2 7 ${stool_height/2.0}" rpy="0 0 0" />
         <material>Gazebo/Turquoise</material>
     </xacro:stool>
 
-    <xacro:stool name="2" radius="${stool_rad}" height="${stool_height}">
+    <xacro:stool name="2" radius="${stool_rad}" height="${stool_height}" color='cyan'>
         <origin xyz="4.2 4.2 ${stool_height/2.0}" rpy="0 0 0" />
         <material>Gazebo/Turquoise</material>
     </xacro:stool>
 
-    <xacro:stool name="3" radius="${stool_rad}" height="${stool_height}">
+    <xacro:stool name="3" radius="${stool_rad}" height="${stool_height}" color='cyan'>
         <origin xyz="4.2 5.8 ${stool_height/2.0}" rpy="0 0 0" />
         <material>Gazebo/Turquoise</material>
     </xacro:stool>

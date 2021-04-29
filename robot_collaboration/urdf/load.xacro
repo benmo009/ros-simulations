@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="load">
+
+    <xacro:property name="load_length" value="1.0" />
+    <xacro:property name="load_width" value="0.5" />
+    <xacro:property name="load_height" value="0.5" />
+
+
+    <link name="load_base_link" />
+
+    <link name="load_body_link" >
+        <visual>
+            <geometry>
+                <box size="${load_length} ${load_width} ${load_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${load_length} ${load_width} ${load_height}" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="10.0"/>
+            <origin xyz="0 0 0" />
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                     iyy="1.0" iyz="0.0"
+                     izz="1.0"/>
+        </inertial>
+    </link>
+
+    <joint name="load_base_joint" type="fixed" >
+        <parent link="load_base_link" />
+        <child link="load_body_link" />
+        <origin xyz="0.0 0 ${load_height/2}" rpy="0 0 0" />
+    </joint>
+</robot>

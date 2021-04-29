@@ -1,0 +1,25 @@
+<launch>
+    <arg name="rvizconfig" value="$(find robot_collaboration)/rviz/rviz.rviz" />
+    <arg name="world" default="$(find mobile_bot_gazebo)/urdf/room.urdf.xacro" />
+
+    <!-- Load costmap -->
+    <node name="map_server" pkg="map_server" type="map_server" 
+    args="$(find robot_collaboration)/maps/costmap.yaml">
+        <remap from="/map" to="/costmap"/>
+    </node>
+
+    <param name="room_description" command="$(find xacro)/xacro $(arg world)" />
+    <!-- Start robot state publisher node -->
+    <node name="room_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="10.0" />
+        <remap from="robot_description" to="room_description" />
+    </node>
+
+    <!-- Spawn load and room -->
+    <include file="$(find robot_collaboration)/launch/spawn_load.launch" />
+
+    <!-- Load robot in rviz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
+
+    <node name="rrt_node" pkg="path_planning" type="RapidlyExploringRandomTree.py" />
+</launch>

@@ -1,0 +1,13 @@
+<launch>
+    <!-- Arguments -->
+    <arg name="load" default="$(find robot_collaboration)/urdf/load.xacro" />
+
+    <param name="load_description" command="$(find xacro)/xacro $(arg load)" />
+
+    <!-- Start robot state publisher node -->
+    <node name="load_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="10.0" />
+        <remap from="robot_description" to="load_description" />
+    </node>
+
+</launch>
